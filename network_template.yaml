@@ -1,0 +1,349 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create a VPC with two app subnets and two db subnets, along with necessary route tables and internet gateway, for a multi-tier application architecture.
+Metadata:
+  Comment: "This is a group project for course INFOSYS 735 group assessment2"
+  Owner: "Group 15"
+Parameters:
+  #CIDR blocks for VPC and subnets
+  tagPrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+  publicSubnetACidr:
+    Type: String
+    Default: 10.0.1.0/26
+    Description: CIDR block for the public subnet1
+  publicSubnetBCidr:
+    Type: String
+    Default: 10.0.1.64/26
+    Description: CIDR block for the public subnet2
+
+  appSubnetACidr:
+    Type: String
+    Default: 10.0.12.0/22
+    Description: CIDR block for the private subnet1
+  appSubnetBCidr:
+    Type: String
+    Default: 10.0.16.0/22
+    Description: CIDR block for the private subnet2
+
+  dbSubnetACidr:
+    Type: String
+    Default: 10.0.20.0/24
+    Description: CIDR block for the db subnetA
+  dbSubnetBCidr:
+    Type: String
+    Default: 10.0.21.0/24
+    Description: CIDR block for the db subnetB
+
+# Rules: set of rules
+# Mappings: set of mappings
+# Conditions: set of conditions
+# Transform: set of transforms
+Resources:
+  #VPC definition
+  MainVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix}-VPC"
+  #Internet Gateway definition
+  MainIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix}-IGW"
+
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MainVPC
+      InternetGatewayId: !Ref MainIGW
+
+  # #NAT gateways in two AZs
+  # NatEIPA:
+  #   Type: AWS::EC2::EIP
+  #   DependsOn: AttachIGW
+  #   Properties:
+  #     Domain: vpc
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${tagPrefix}-NatEIP-A"
+
+  # NatGatewayA:
+  #   Type: AWS::EC2::NatGateway
+  #   DependsOn: AttachIGW
+  #   Properties:
+  #     AllocationId: !GetAtt NatEIPA.AllocationId
+  #     SubnetId: !Ref PublicSubnetA
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${tagPrefix}-NatGateway-A"
+  # NatEIPB:
+  #   Type: AWS::EC2::EIP
+  #   DependsOn: AttachIGW
+  #   Properties:
+  #     Domain: vpc
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${tagPrefix}-NatEIP-B"
+
+  # NatGatewayB:
+  #   Type: AWS::EC2::NatGateway
+  #   DependsOn: AttachIGW
+  #   Properties:
+  #     AllocationId: !GetAtt NatEIPB.AllocationId
+  #     SubnetId: !Ref PublicSubnetB
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${tagPrefix}-NatGateway-B"
+
+  #Two public subnets in different AZs
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref publicSubnetACidr
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} PublicSubnet A"
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref publicSubnetBCidr
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} PublicSubnet B"
+
+  #Two App subnets in different AZs
+  AppSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref appSubnetACidr
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} App Subnet A"
+
+  AppSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref appSubnetBCidr
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} App Subnet B"
+
+  #two Db subnets in different AZs
+  DbSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref dbSubnetACidr
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} DB Subnet A"
+  DbSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MainVPC
+      CidrBlock: !Ref dbSubnetBCidr
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} DB Subnet B"
+
+  #Public Route Table definition
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} PublicRouteTable"
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MainIGW
+    DependsOn: AttachIGW
+
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetB
+      RouteTableId: !Ref PublicRouteTable
+
+  #Private Route Table definition
+  PrivateRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} PrivateRouteTable A"
+  # PrivateRouteA:
+  #   Type: AWS::EC2::Route
+  #   Properties:
+  #     RouteTableId: !Ref PrivateRouteTableA
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     NatGatewayId: !Ref NatGatewayA
+  #   DependsOn: PrivateRouteTableA
+
+  PrivateRouteTableB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MainVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${tagPrefix} PrivatRouteTable B"
+  # PrivateRouteB:
+  #   Type: AWS::EC2::Route
+  #   Properties:
+  #     RouteTableId: !Ref PrivateRouteTableB
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     NatGatewayId: !Ref NatGatewayB
+  #   DependsOn: PrivateRouteTableB
+
+  AppSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref AppSubnetA
+      RouteTableId: !Ref PrivateRouteTableA
+
+  AppSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref AppSubnetB
+      RouteTableId: !Ref PrivateRouteTableB
+
+  DbSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DbSubnetA
+      RouteTableId: !Ref PrivateRouteTableA
+  DbSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref DbSubnetB
+      RouteTableId: !Ref PrivateRouteTableB
+  SecurityGroupLoadALB:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTPS from everywhere
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        #allowing HTTP from anywhere
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # Allow HTTP from anywhere
+        #allowing HTTPS from anywhere
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0 # Allow HTTPS from anywhere
+  SecurityGroupApp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP from WebServer SG only
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref SecurityGroupLoadALB # Allow HTTP from Load Balancer SG
+  SecurityGroupDb:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable Oracle from App SG only
+      VpcId: !Ref MainVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 1521
+          ToPort: 1521
+          SourceSecurityGroupId: !Ref SecurityGroupApp # Allow MySQL/Aurora from App SG
+Outputs:
+  #export VPC and subnet IDs for use in other stacks
+  VPCId:
+    Description: VPC ID
+    Value: !Ref MainVPC
+    Export:
+      Name: !Sub "${AWS::StackName}-MainVPCId"
+  PublicSubnetAId:
+    Description: Public Subnet A ID
+    Value: !Ref PublicSubnetA
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetAId"
+  PublicSubnetBId:
+    Description: Public Subnet B ID
+    Value: !Ref PublicSubnetB
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetBId"
+  AppSubnetAId:
+    Description: App Subnet A ID
+    Value: !Ref AppSubnetA
+    Export:
+      Name: !Sub "${AWS::StackName}-AppSubnetAId"
+  AppSubnetBId:
+    Description: App Subnet B ID
+    Value: !Ref AppSubnetB
+    Export:
+      Name: !Sub "${AWS::StackName}-AppSubnetBId"
+  DbSubnetAId:
+    Description: DB Subnet A ID
+    Value: !Ref DbSubnetA
+    Export:
+      Name: !Sub "${AWS::StackName}-DbSubnetAId"
+  DbSubnetBId:
+    Description: DB Subnet B ID
+    Value: !Ref DbSubnetB
+    Export:
+      Name: !Sub "${AWS::StackName}-DbSubnetBId"
+  #export security group IDs for use in other stacks
+  LoadBalancerSecurityGroupId:
+    Description: Security Group ID for Load Balancer
+    Value: !Ref SecurityGroupLoadALB
+    Export:
+      Name: !Sub "${AWS::StackName}-LoadBalancerSecurityGroupId"
+  AppSecurityGroupId:
+    Description: Security Group ID for App Servers
+    Value: !Ref SecurityGroupApp
+    Export:
+      Name: !Sub "${AWS::StackName}-AppSecurityGroupId"
+  DbSecurityGroupId:
+    Description: Security Group ID for Database Servers
+    Value: !Ref SecurityGroupDb
+    Export:
+      Name: !Sub "${AWS::StackName}-DbSecurityGroupId"

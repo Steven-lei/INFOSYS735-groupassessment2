@@ -1,0 +1,40 @@
+This is a group project assessment for INFOSYS 735
+
+Authors:
+
+- Steven Lei
+- Feihao Shi
+- Mingze Du
+- Congyu Zhao
+
+Objectives:
+
+- automate the infrastructure deployment using CloudFormation
+
+Modules:
+
+- network template
+
+  1. Create a VPC accoring to the infrastructure diagram
+
+  2. Create an Internet Gateway and attach it to the VPC
+  3. Create Public Route Table and add a route to the Internet Gateway
+  4. Create two public subnets in different availability zones
+  5. Associate the public subnets with the Public Route Table
+
+  6. Create two NAT Gateways in each public subnet
+  7. Create Two private Route tables and add route to each NAT Gateway
+
+  8. Create two APP subnets in different availability zones
+  9. Associate the APP subnets with the private route tables
+
+  10. Create two DB subnets in different availability zones
+  11. Associate the DB subnets with the private route tables
+
+  12. Create Security Groups for ALB, APPs and RDS instance, allowing oracle port 1521 from APPs security group to RDS security group, allowing HTTP port 80 from ALB security group to APPs security group, allowing HTTPS port 443 from anywhere to ALB security group
+  13. Create Outputs for ALB DNS, VPC ID, Public Subnet IDs, APP Subnet IDs, DB Subnet IDs, Security Group IDs etc.
+
+- db template (use the network template as a nested stack)
+  1. Create a RDS Oracle subnet group using the DB subnets created in the network template
+  2. Create Secrets Manager secret to store the RDS Oracle master username and password
+  3. Create a RDS Oracle instance in the DB subnet with the DB security group created in the network template

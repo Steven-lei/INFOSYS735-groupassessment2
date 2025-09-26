@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DB Stack with Subnet Group and RDS instance.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+Parameters:
+  #Prefix for resource names
+  tagPrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+
+  #the stackname of the network stack to import VPC and subnet details from
+  NetworkStackName:
+    Type: String
+    Default: network
+    Description: Name of the network stack to import VPC and subnet details from
+
+  #DB username
+  DBUsername:
+    Type: String
+    Default: dbadmin
+    Description: Username for the RDS instance
+
+  #DB password
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for the RDS instance
+Resources:
+  #Create secret in Secrets Manager to store RDS credentials, dbhost, dbport, dbname,and dburl will be added automatically
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub ${tagPrefix}-RDSSecret
+      Description: Secret for RDS instance credentials
+      SecretString: !Sub |
+        {
+          "username": "${DBUsername}",
+          "password": "${DBPassword}"
+        }
+      Tags:
+        - Key: Name
+          Value: !Sub ${tagPrefix}-RDSSecret
+  #Create DB Subnet Group for RDS instance
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS instance
+      SubnetIds:
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-DbSubnetAId
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-DbSubnetBId
+      Tags:
+        - Key: Name
+          Value: !Sub ${tagPrefix}-DBSubnetGroup
+  #Create RDS instance for Oracle
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub ${tagPrefix}-RDSInstance
+      StorageType: gp2
+      AllocatedStorage: "20"
+      DBInstanceClass: db.t3.small
+      Engine: oracle-se2
+      EngineVersion: 19.0.0.0.ru-2025-07.rur-2025-07.r1
+      LicenseModel: license-included
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      StorageEncrypted: true
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-DbSecurityGroupId
+      MultiAZ: false
+      PubliclyAccessible: false # RDS instance is not publicly accessible
+      DeletionProtection: false
+      #BackupRetentionPeriod: 7 # Enable automated backups with a retention period of 7 days
+      #PreferredBackupWindow: "03:00-04:00" # Set preferred backup window
+      #PreferredMaintenanceWindow: "sun:05:00-sun:06:00" # Set preferred maintenance window
+      Tags:
+        - Key: Name
+          Value: !Sub ${tagPrefix}-RDSInstance
+
+Outputs:
+  RDSEndpoint:
+    Description: RDS endpoint address
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub ${tagPrefix}-RDSEndpoint
+
+  RDSPort:
+    Description: RDS endpoint port
+    Value: !GetAtt RDSInstance.Endpoint.Port
+    Export:
+      Name: !Sub ${tagPrefix}-RDSPort
