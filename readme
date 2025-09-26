@@ -1,40 +1,61 @@
-This is a group project assessment for INFOSYS 735
+# INFOSYS 735 Group Project Assessment
 
-Authors:
+## Authors
 
 - Steven Lei
 - Feihao Shi
 - Mingze Du
 - Congyu Zhao
 
-Objectives:
+## Project Overview
 
-- automate the infrastructure deployment using CloudFormation
+This project automates infrastructure deployment using **AWS CloudFormation** for a multi-tier application setup.
 
-Modules:
+## Objectives
 
-- network template
+- Automate the deployment of network and database infrastructure using CloudFormation.
+- Ensure security and scalability by configuring VPCs, subnets, route tables, NAT gateways, and security groups.
+- Deploy an RDS Oracle instance with secure credentials managed in AWS Secrets Manager.
 
-  1. Create a VPC accoring to the infrastructure diagram
+## Modules
 
-  2. Create an Internet Gateway and attach it to the VPC
-  3. Create Public Route Table and add a route to the Internet Gateway
-  4. Create two public subnets in different availability zones
-  5. Associate the public subnets with the Public Route Table
+### 1. Network Template
 
-  6. Create two NAT Gateways in each public subnet
-  7. Create Two private Route tables and add route to each NAT Gateway
+This template sets up the core network infrastructure.
 
-  8. Create two APP subnets in different availability zones
-  9. Associate the APP subnets with the private route tables
+**Features:**
 
-  10. Create two DB subnets in different availability zones
-  11. Associate the DB subnets with the private route tables
+- Create a VPC according to the infrastructure diagram.
+- Configure an Internet Gateway and public/private route tables.
+- Deploy public, APP, and DB subnets across multiple Availability Zones.
+- Set up NAT Gateways for private subnets.
+- Configure Security Groups:
+  - ALB: allow HTTPS (443) from anywhere
+  - APP: allow HTTP (80) from ALB Security Group
+  - RDS: allow Oracle port (1521) from APP Security Group
+- Outputs: ALB DNS, VPC ID, Subnet IDs, Security Group IDs, etc.
 
-  12. Create Security Groups for ALB, APPs and RDS instance, allowing oracle port 1521 from APPs security group to RDS security group, allowing HTTP port 80 from ALB security group to APPs security group, allowing HTTPS port 443 from anywhere to ALB security group
-  13. Create Outputs for ALB DNS, VPC ID, Public Subnet IDs, APP Subnet IDs, DB Subnet IDs, Security Group IDs etc.
+### 2. DB Template
 
-- db template (use the network template as a nested stack)
-  1. Create a RDS Oracle subnet group using the DB subnets created in the network template
-  2. Create Secrets Manager secret to store the RDS Oracle master username and password
-  3. Create a RDS Oracle instance in the DB subnet with the DB security group created in the network template
+This template uses the Network Template as a nested stack and provisions database resources.
+
+**Features:**
+
+- Create an RDS Oracle Subnet Group using the DB subnets.
+- Create a Secrets Manager secret to store the RDS master username and password.
+- Deploy an RDS Oracle instance with the DB Security Group from the Network Template.
+
+## Deployment Instructions
+
+1. Deploy the **Network Template** stack first.
+2. Deploy the **DB Template** stack, referencing the Network Template outputs as needed.
+3. Verify resources in the AWS Console (VPCs, Subnets, Route Tables, Security Groups, ALB, RDS).
+
+## Outputs
+
+- ALB DNS
+- VPC ID
+- Public Subnet IDs
+- APP Subnet IDs
+- DB Subnet IDs
+- Security Group IDs
