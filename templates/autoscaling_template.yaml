@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create a targetGroup.
+Description: CloudFormation template to create a targetGroup and an AutoScalingGroup.
 Metadata:
   Comment: "This is a group project for course INFOSYS 735 group assessment2"
   Owner: "Group 15"

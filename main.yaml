@@ -49,9 +49,11 @@ Resources:
     Properties:
       TemplateURL: !Sub "${repositoryUrl}/templates/launch_template.yaml"
       Parameters:
+        namePrefix: !Ref namePrefix
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
 
   WebServerStack:
     DependsOn:
@@ -74,20 +76,51 @@ Resources:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
         SubnetIds:
-          - !GetAtt NetworkStack.Outputs.PublicSubnetAId
-          - !GetAtt NetworkStack.Outputs.PublicSubnetBId
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
         LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
         LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
-
-  DBStack:
+  ALBStack:
     Type: AWS::CloudFormation::Stack
-    DependsOn: NetworkStack
+    DependsOn:
+      - NetworkStack
+      - SecurityGroupStack
+      - AutoScalingStack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/db_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/alb_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
         SubnetIds:
-          - !GetAtt NetworkStack.Outputs.DbSubnetAId
-          - !GetAtt NetworkStack.Outputs.DbSubnetBId
-        DBUsername: !Ref DBUsername
-        DBPassword: !Ref DBPassword
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+        TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
+
+  # DBStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   DependsOn: NetworkStack
+  #   Properties:
+  #     TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+  #     Parameters:
+  #       namePrefix: !Ref namePrefix
+  #       SubnetIds:
+  #         !Join [
+  #           ",",
+  #           [
+  #             !GetAtt NetworkStack.Outputs.DbSubnetAId,
+  #             !GetAtt NetworkStack.Outputs.DbSubnetBId,
+  #           ],
+  #         ]
+  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
+  #       DBUsername: !Ref DBUsername
+  #       DBPassword: !Ref DBPassword

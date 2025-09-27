@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create an application Load balancer.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the load balancer will be created
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs where the load balancer will be created
+  LoadBalancerSecurityGroupId:
+    Type: String
+    Description: Security Group ID for the Load Balancer
+  TargetGroupArn:
+    Type: String
+    Description: ARN of the target group to register with the load balancer
+Resources:
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${namePrefix}-ALB"
+      Subnets: !Ref SubnetIds
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroupId
+      Scheme: internet-facing
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ALB"
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroupArn
+Outputs:
+  LoadBalancerDNSName:
+    Description: DNS Name of the Load Balancer
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+    Export:
+      Name: !Sub "${AWS::StackName}-LoadBalancerDNSName"
+  LoadBalancerArn:
+    Description: ARN of the Load Balancer

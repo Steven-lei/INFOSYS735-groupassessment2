@@ -4,6 +4,13 @@ Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15
 Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  SecurityGroupId:
+    Type: String
+    Description: Security Group ID for the EC2 instances
   LatestAmiId:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
     Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
@@ -28,6 +35,8 @@ Resources:
         ImageId: !Ref LatestAmiId
         InstanceType: !Ref InstanceType
         KeyName: !Ref KeyName
+        SecurityGroupIds:
+          - !Ref SecurityGroupId
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
