@@ -29,13 +29,35 @@ This template sets up the core network infrastructure.
 - Configure an Internet Gateway and public/private route tables.
 - Deploy public, APP, and DB subnets across multiple Availability Zones.
 - Set up NAT Gateways for private subnets.
+
+- Outputs: VPC ID, Subnet IDs.
+
+### 2. SecurityGroup Template
+
 - Configure Security Groups:
+
   - ALB: allow HTTPS (443) from anywhere
   - APP: allow HTTP (80) from ALB Security Group
   - RDS: allow Oracle port (1521) from APP Security Group
-- Outputs: ALB DNS, VPC ID, Subnet IDs, Security Group IDs, etc.
 
-### 2. DB Template
+  - Outputs: Security Group IDs.
+
+### 3. LaunchTemplate Template
+
+- Create a LaunchTemplate using specific ImageID:
+
+  - Outputs: LaunchTemplateId, Version for AutoScaling Group.
+
+### 4. Autoscaling Template
+
+- Create a TargetGroup
+- Create an AutoScaling Group
+
+### 5. Webserver Template
+
+- Create a Webserver in Public Subnet(can be used to create golden image)
+
+### 6. DB Template
 
 This template uses the Network Template as a nested stack and provisions database resources.
 
@@ -48,6 +70,4 @@ This template uses the Network Template as a nested stack and provisions databas
 
 ## Deployment Instructions
 
-1. Deploy the **Network Template** stack first.
-2. Deploy the **DB Template** stack, referencing the Network Template outputs as needed.
-3. Verify resources in the AWS Console (VPCs, Subnets, Route Tables, Security Groups, ALB, RDS).
+1. Deploy main.yaml from Console or using the following CLI command

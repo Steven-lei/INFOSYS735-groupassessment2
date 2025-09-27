@@ -75,6 +75,7 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.MainVPCId
         SubnetIds:
           - !GetAtt NetworkStack.Outputs.PublicSubnetAId
           - !GetAtt NetworkStack.Outputs.PublicSubnetBId

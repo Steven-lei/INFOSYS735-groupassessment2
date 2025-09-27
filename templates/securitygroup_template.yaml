@@ -17,7 +17,7 @@ SecurityGroupLoadALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable HTTPS from everywhere
-      VpcId: !Ref MainVPC
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         #allowing HTTP from anywhere
         - IpProtocol: tcp
