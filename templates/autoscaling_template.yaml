@@ -34,7 +34,7 @@ Resources:
       Port: 80
       Protocol: HTTP
       VpcId: !Ref VPCId
-      HealthCheckPath: /
+      HealthCheckPath: /healthcheck.html
       HealthCheckIntervalSeconds: 10
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 3
@@ -61,6 +61,18 @@ Resources:
         - Key: Name
           Value: !Sub "${namePrefix}-AutoScalingInstance"
           PropagateAtLaunch: true
+
+TrackingPolicy:
+  Type: AWS::AutoScaling::ScalingPolicy
+  Properties:
+    AutoScalingGroupName: !Ref AutoScalingGroup
+    PolicyType: TargetTrackingScaling
+    TargetTrackingConfiguration:
+      PredefinedMetricSpecification:
+        PredefinedMetricType: ASGAverageCPUUtilization
+      TargetValue: 50.0
+      Cooldown: 60
+      DisableScaleIn: false
 
 Outputs:
   TargetGroupARN:
