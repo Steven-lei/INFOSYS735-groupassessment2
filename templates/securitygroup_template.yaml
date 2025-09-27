@@ -13,7 +13,7 @@ Parameters:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the security group will be created
 Resources:
-SecurityGroupLoadALB:
+  SecurityGroupLoadALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable HTTPS from everywhere

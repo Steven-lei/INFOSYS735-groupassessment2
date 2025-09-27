@@ -39,7 +39,7 @@ Resources:
   SecurityGroupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/security_group_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
@@ -66,18 +66,18 @@ Resources:
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-  AutoScalingStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
-      Parameters:
-        namePrefix: !Ref namePrefix
-        VPCId: !GetAtt NetworkStack.Outputs.VPCId
-        SubnetIds:
-          - !GetAtt NetworkStack.Outputs.PublicSubnetAId
-          - !GetAtt NetworkStack.Outputs.PublicSubnetBId
-        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
-        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+  # AutoScalingStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+  #     Parameters:
+  #       namePrefix: !Ref namePrefix
+  #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
+  #       SubnetIds:
+  #         - !GetAtt NetworkStack.Outputs.PublicSubnetAId
+  #         - !GetAtt NetworkStack.Outputs.PublicSubnetBId
+  #       LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+  #       LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
 
   # DBStack:
   #   Type: AWS::CloudFormation::Stack
