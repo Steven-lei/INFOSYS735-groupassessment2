@@ -54,7 +54,8 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/webserver_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        NetworkStackName: !Ref NetworkStack
+        SubnetId: !ImportValue "NetworkStack-PublicSubnetAId"
+        SecurityGroup: !ImportValue "NetworkStack-LoadBalancerSecurityGroupId"
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
