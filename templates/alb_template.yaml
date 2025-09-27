@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Create an application Load balancer using specific target group.
+Description:
+  Create an application Load balancer using specific target group, using the certificate from ACM for HTTPS listener, and
+  update the Route53 A record to point to the ALB after creation
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15
@@ -18,6 +20,12 @@ Parameters:
   TargetGroupArn:
     Type: String
     Description: ARN of the target group to register with the load balancer
+  HostedZoneId:
+    Type: String
+    Description: Route53 Hosted Zone ID for the domain
+  CertificateArn:
+    Type: String
+    Description: ACM Certificate ARN for HTTPS listener
 Resources:
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -36,9 +44,47 @@ Resources:
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP
+      # DefaultActions:
+      #   - Type: forward
+      #     TargetGroupArn: !Ref TargetGroupArn
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: HTTPS
+            Port: "443"
+            StatusCode: HTTP_301
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ALBListener"
+
+  ALBHttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroupArn
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ALBHttpsListener"
+
+  # Update the A record to point to the ALB
+  AliasRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "${namePrefix}.theflower.co.nz" # the record name
+      Type: A # A record is used for alias to ALB
+      AliasTarget:
+        DNSName: !GetAtt ApplicationLoadBalancer.DNSName
+        HostedZoneId: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
+        EvaluateTargetHealth: false
+      TTL: 300
+
 Outputs:
   LoadBalancerDNSName:
     Description: DNS Name of the Load Balancer
