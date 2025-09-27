@@ -1,0 +1,67 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create a targetGroup.
+Metadata:
+  Comment: "This is a group project for course INFOSYS 735 group assessment2"
+  Owner: "Group 15"
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+
+  networkStackName:
+    Type: String
+    Default: network
+    Description: Name of the network stack to import VPC and subnet details from
+
+  lanchTamplateStackName:
+    Type: String
+    Default: launchtemplate
+    Description: Name of the launch template stack to import Launch Template details from
+Resources:
+  AppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${namePrefix}-AppTargetGroup"
+      Port: 80
+      Protocol: HTTP
+      VpcId: !ImportValue
+        "Fn::Sub": "${networkStackName}-MainVPCId" # Importing VPC ID from VPCStack
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 2
+      TargetType: instance
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-AppTargetGroup"
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub "${namePrefix}-AutoScalingGroup"
+      VPCZoneIdentifier:
+        - !ImportValue
+          "Fn::Sub": "${networkStackName}-PublicSubnetAId" # Importing Public Subnet A ID from VPCStack
+        - !ImportValue
+          "Fn::Sub": "${networkStackName}-PublicSubnetBId" # Importing Public Subnet B ID from VPCStack
+      LaunchTemplate:
+        LaunchTemplateId: !ImportValue
+          "Fn::Sub": "${lanchTamplateStackName}-WebLaunchTemplateId" # Importing Launch Template ID from LaunchTemplateStack
+        Version: !ImportValue
+          "Fn::Sub": "${lanchTamplateStackName}-WebLaunchTemplateVersion" # Importing Launch Template Version from LaunchTemplateStack
+      MinSize: 1
+      MaxSize: 3
+      DesiredCapacity: 2
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-AutoScalingInstance"
+          PropagateAtLaunch: true
+
+Outputs:
+  TargetGroupARN:
+    Description: The ARN of the target group
+    Value: !Ref AppTargetGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-AppTargetGroupARN"

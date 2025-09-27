@@ -6,7 +6,7 @@ Metadata:
   Owner: "Group 15"
 Parameters:
   #CIDR blocks for VPC and subnets
-  tagPrefix:
+  namePrefix:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
@@ -55,14 +55,14 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix}-VPC"
+          Value: !Sub "${namePrefix}-VPC"
   #Internet Gateway definition
   MainIGW:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix}-IGW"
+          Value: !Sub "${namePrefix}-IGW"
 
   AttachIGW:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -78,7 +78,7 @@ Resources:
   #     Domain: vpc
   #     Tags:
   #       - Key: Name
-  #         Value: !Sub "${tagPrefix}-NatEIP-A"
+  #         Value: !Sub "${namePrefix}-NatEIP-A"
 
   # NatGatewayA:
   #   Type: AWS::EC2::NatGateway
@@ -88,7 +88,7 @@ Resources:
   #     SubnetId: !Ref PublicSubnetA
   #     Tags:
   #       - Key: Name
-  #         Value: !Sub "${tagPrefix}-NatGateway-A"
+  #         Value: !Sub "${namePrefix}-NatGateway-A"
   # NatEIPB:
   #   Type: AWS::EC2::EIP
   #   DependsOn: AttachIGW
@@ -96,7 +96,7 @@ Resources:
   #     Domain: vpc
   #     Tags:
   #       - Key: Name
-  #         Value: !Sub "${tagPrefix}-NatEIP-B"
+  #         Value: !Sub "${namePrefix}-NatEIP-B"
 
   # NatGatewayB:
   #   Type: AWS::EC2::NatGateway
@@ -106,7 +106,7 @@ Resources:
   #     SubnetId: !Ref PublicSubnetB
   #     Tags:
   #       - Key: Name
-  #         Value: !Sub "${tagPrefix}-NatGateway-B"
+  #         Value: !Sub "${namePrefix}-NatGateway-B"
 
   #Two public subnets in different AZs
   PublicSubnetA:
@@ -118,7 +118,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} PublicSubnet A"
+          Value: !Sub "${namePrefix} PublicSubnet A"
 
   PublicSubnetB:
     Type: AWS::EC2::Subnet
@@ -129,7 +129,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} PublicSubnet B"
+          Value: !Sub "${namePrefix} PublicSubnet B"
 
   #Two App subnets in different AZs
   AppSubnetA:
@@ -141,7 +141,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} App Subnet A"
+          Value: !Sub "${namePrefix} App Subnet A"
 
   AppSubnetB:
     Type: AWS::EC2::Subnet
@@ -152,7 +152,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} App Subnet B"
+          Value: !Sub "${namePrefix} App Subnet B"
 
   #two Db subnets in different AZs
   DbSubnetA:
@@ -164,7 +164,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} DB Subnet A"
+          Value: !Sub "${namePrefix} DB Subnet A"
   DbSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -174,7 +174,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} DB Subnet B"
+          Value: !Sub "${namePrefix} DB Subnet B"
 
   #Public Route Table definition
   PublicRouteTable:
@@ -183,7 +183,7 @@ Resources:
       VpcId: !Ref MainVPC
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} PublicRouteTable"
+          Value: !Sub "${namePrefix} PublicRouteTable"
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -212,7 +212,7 @@ Resources:
       VpcId: !Ref MainVPC
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} PrivateRouteTable A"
+          Value: !Sub "${namePrefix} PrivateRouteTable A"
   # PrivateRouteA:
   #   Type: AWS::EC2::Route
   #   Properties:
@@ -227,7 +227,7 @@ Resources:
       VpcId: !Ref MainVPC
       Tags:
         - Key: Name
-          Value: !Sub "${tagPrefix} PrivatRouteTable B"
+          Value: !Sub "${namePrefix} PrivatRouteTable B"
   # PrivateRouteB:
   #   Type: AWS::EC2::Route
   #   Properties:
@@ -277,7 +277,7 @@ Resources:
   SecurityGroupApp:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable HTTP from WebServer SG only
+      GroupDescription: Enable HTTP from ALB SG only
       VpcId: !Ref MainVPC
       SecurityGroupIngress:
         - IpProtocol: tcp

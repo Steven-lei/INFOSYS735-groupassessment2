@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create a launchtemplate using existing AMI
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+
+  repositoryUrl:
+    Type: String
+    #GitURL: https://raw.githubusercontent.com/youruser/myrepo/main
+    #BucketURL: https://s3.amazonaws.com/your-bucket-name
+    Default: https://anygroup-templates.s3.us-east-1.amazonaws.com
+    Description: S3 bucket URL where the nested stack templates are stored, such as https://s3.amazonaws.com/your-bucket-name
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Default: vockey
+  DBUsername:
+    Type: String
+    Default: dbadmin
+    Description: Username for the RDS instance
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for the RDS instance
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/network_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+
+  LaunchTemplateStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/launch_template.yaml"
+      Parameters:
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  TargetGroupStack:
+    DependsOn:
+      - NetworkStack
+      - LaunchTemplateStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/target_group_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        networkStackName: !Ref NetworkStack
+        lanchTamplateStackName: !Ref LaunchTemplateStack
+
+  # DBStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   DependsOn: NetworkStack
+  #   Properties:
+  #     TemplateURL: !Sub "${repositoryUrl}/db_template.yaml"
+  #     Parameters:
+  #       namePrefix: !Ref namePrefix
+  #       NetworkStackName: !Ref NetworkStack
+  #       DBUsername: !Ref DBUsername
+  #       DBPassword: !Ref DBPassword

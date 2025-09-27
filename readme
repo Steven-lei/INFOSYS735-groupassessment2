@@ -44,18 +44,10 @@ This template uses the Network Template as a nested stack and provisions databas
 - Create an RDS Oracle Subnet Group using the DB subnets.
 - Create a Secrets Manager secret to store the RDS master username and password.
 - Deploy an RDS Oracle instance with the DB Security Group from the Network Template.
+- Outputs: RDS Endpoint, RDS Port
 
 ## Deployment Instructions
 
 1. Deploy the **Network Template** stack first.
 2. Deploy the **DB Template** stack, referencing the Network Template outputs as needed.
 3. Verify resources in the AWS Console (VPCs, Subnets, Route Tables, Security Groups, ALB, RDS).
-
-## Outputs
-
-- ALB DNS
-- VPC ID
-- Public Subnet IDs
-- APP Subnet IDs
-- DB Subnet IDs
-- Security Group IDs

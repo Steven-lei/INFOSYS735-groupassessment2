@@ -5,7 +5,7 @@ Metadata:
   Owner: Group 15
 Parameters:
   #Prefix for resource names
-  tagPrefix:
+  namePrefix:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
@@ -32,7 +32,7 @@ Resources:
   DBSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub ${tagPrefix}-RDSSecret
+      Name: !Sub ${namePrefix}-RDSSecret
       Description: Secret for RDS instance credentials
       SecretString: !Sub |
         {
@@ -41,7 +41,7 @@ Resources:
         }
       Tags:
         - Key: Name
-          Value: !Sub ${tagPrefix}-RDSSecret
+          Value: !Sub ${namePrefix}-RDSSecret
   #Create DB Subnet Group for RDS instance
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -54,12 +54,12 @@ Resources:
           Fn::Sub: ${NetworkStackName}-DbSubnetBId
       Tags:
         - Key: Name
-          Value: !Sub ${tagPrefix}-DBSubnetGroup
+          Value: !Sub ${namePrefix}-DBSubnetGroup
   #Create RDS instance for Oracle
   RDSInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: !Sub ${tagPrefix}-RDSInstance
+      DBInstanceIdentifier: !Sub ${namePrefix}-RDSInstance
       StorageType: gp2
       AllocatedStorage: "20"
       DBInstanceClass: db.t3.small
@@ -81,17 +81,17 @@ Resources:
       #PreferredMaintenanceWindow: "sun:05:00-sun:06:00" # Set preferred maintenance window
       Tags:
         - Key: Name
-          Value: !Sub ${tagPrefix}-RDSInstance
+          Value: !Sub ${namePrefix}-RDSInstance
 
 Outputs:
   RDSEndpoint:
     Description: RDS endpoint address
     Value: !GetAtt RDSInstance.Endpoint.Address
     Export:
-      Name: !Sub ${tagPrefix}-RDSEndpoint
+      Name: !Sub ${namePrefix}-RDSEndpoint
 
   RDSPort:
     Description: RDS endpoint port
     Value: !GetAtt RDSInstance.Endpoint.Port
     Export:
-      Name: !Sub ${tagPrefix}-RDSPort
+      Name: !Sub ${namePrefix}-RDSPort
