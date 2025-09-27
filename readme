@@ -98,4 +98,6 @@ In Academy Learn Lab or any CLI environment:
 
 ## run main.yaml (the others are nested and will be run automatically)
 
-5. Deploy main.yaml from Console or using the following CLI command
+5. Deploy the main.yaml from Console or using the following CLI command
+
+eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
