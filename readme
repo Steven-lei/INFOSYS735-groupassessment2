@@ -68,6 +68,34 @@ This template uses the Network Template as a nested stack and provisions databas
 - Deploy an RDS Oracle instance with the DB Security Group from the Network Template.
 - Outputs: RDS Endpoint, RDS Port
 
+##
+
+##
+
 ## Deployment Instructions
 
-1. Deploy main.yaml from Console or using the following CLI command
+##
+
+##
+
+In Academy Learn Lab or any CLI environment:
+
+## clone cloudformation template
+
+1. git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
+
+## change directory
+
+2. cd INFOSYS735-groupassessment2/
+
+## create s3 bucket to hold the templates
+
+3. s3api create-bucket --bucket anygroup-templates --query "Location" --output text
+
+## upload to S3 bucket
+
+4. aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
+
+## run main.yaml (the others are nested and will be run automatically)
+
+5. Deploy main.yaml from Console or using the following CLI command

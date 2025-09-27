@@ -33,7 +33,7 @@ SecurityGroupLoadALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable HTTP from ALB SG only
-      VpcId: !Ref MainVPC
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -43,7 +43,7 @@ SecurityGroupLoadALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable Oracle from App SG only
-      VpcId: !Ref MainVPC
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 1521
