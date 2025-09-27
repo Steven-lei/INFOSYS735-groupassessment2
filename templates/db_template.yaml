@@ -10,11 +10,14 @@ Parameters:
     Default: AnyGroup
     Description: Prefix for resource names
 
-  #the stackname of the network stack to import VPC and subnet details from
-  NetworkStackName:
+  #SubnetIds for DB Subnet Group
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs for the DB Subnet Group
+
+  SecurityGroupId:
     Type: String
-    Default: network
-    Description: Name of the network stack to import VPC and subnet details from
+    Description: Security Group ID for the RDS instance
 
   #DB username
   DBUsername:
@@ -47,11 +50,7 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Subnet group for RDS instance
-      SubnetIds:
-        - !ImportValue
-          Fn::Sub: ${NetworkStackName}-DbSubnetAId
-        - !ImportValue
-          Fn::Sub: ${NetworkStackName}-DbSubnetBId
+      SubnetIds: !Ref SubnetIds
       Tags:
         - Key: Name
           Value: !Sub ${namePrefix}-DBSubnetGroup
@@ -71,8 +70,7 @@ Resources:
       StorageEncrypted: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
-        - !ImportValue
-          Fn::Sub: ${NetworkStackName}-DbSecurityGroupId
+        - !Ref SecurityGroupId
       MultiAZ: false
       PubliclyAccessible: false # RDS instance is not publicly accessible
       DeletionProtection: false

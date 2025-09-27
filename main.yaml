@@ -66,26 +66,28 @@ Resources:
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-  # AutoScalingStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
-  #       SubnetIds:
-  #         - !GetAtt NetworkStack.Outputs.PublicSubnetAId
-  #         - !GetAtt NetworkStack.Outputs.PublicSubnetBId
-  #       LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
-  #       LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+  AutoScalingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        SubnetIds:
+          - !GetAtt NetworkStack.Outputs.PublicSubnetAId
+          - !GetAtt NetworkStack.Outputs.PublicSubnetBId
+        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
 
-  # DBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: NetworkStack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/db_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       NetworkStackName: !Ref NetworkStack
-  #       DBUsername: !Ref DBUsername
-  #       DBPassword: !Ref DBPassword
+  DBStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/db_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          - !GetAtt NetworkStack.Outputs.DbSubnetAId
+          - !GetAtt NetworkStack.Outputs.DbSubnetBId
+        DBUsername: !Ref DBUsername
+        DBPassword: !Ref DBPassword
