@@ -70,43 +70,43 @@ Resources:
       VpcId: !Ref MainVPC
       InternetGatewayId: !Ref MainIGW
 
-  # #NAT gateways in two AZs
-  # NatEIPA:
-  #   Type: AWS::EC2::EIP
-  #   DependsOn: AttachIGW
-  #   Properties:
-  #     Domain: vpc
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub "${namePrefix}-NatEIP-A"
+  #NAT gateways in two AZs
+  NatEIPA:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachIGW
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-NatEIP-A"
 
-  # NatGatewayA:
-  #   Type: AWS::EC2::NatGateway
-  #   DependsOn: AttachIGW
-  #   Properties:
-  #     AllocationId: !GetAtt NatEIPA.AllocationId
-  #     SubnetId: !Ref PublicSubnetA
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub "${namePrefix}-NatGateway-A"
-  # NatEIPB:
-  #   Type: AWS::EC2::EIP
-  #   DependsOn: AttachIGW
-  #   Properties:
-  #     Domain: vpc
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub "${namePrefix}-NatEIP-B"
+  NatGatewayA:
+    Type: AWS::EC2::NatGateway
+    DependsOn: AttachIGW
+    Properties:
+      AllocationId: !GetAtt NatEIPA.AllocationId
+      SubnetId: !Ref PublicSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-NatGateway-A"
+  NatEIPB:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachIGW
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-NatEIP-B"
 
-  # NatGatewayB:
-  #   Type: AWS::EC2::NatGateway
-  #   DependsOn: AttachIGW
-  #   Properties:
-  #     AllocationId: !GetAtt NatEIPB.AllocationId
-  #     SubnetId: !Ref PublicSubnetB
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub "${namePrefix}-NatGateway-B"
+  NatGatewayB:
+    Type: AWS::EC2::NatGateway
+    DependsOn: AttachIGW
+    Properties:
+      AllocationId: !GetAtt NatEIPB.AllocationId
+      SubnetId: !Ref PublicSubnetB
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-NatGateway-B"
 
   #Two public subnets in different AZs
   PublicSubnetA:
@@ -213,13 +213,13 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PrivateRouteTable A"
-  # PrivateRouteA:
-  #   Type: AWS::EC2::Route
-  #   Properties:
-  #     RouteTableId: !Ref PrivateRouteTableA
-  #     DestinationCidrBlock: 0.0.0.0/0
-  #     NatGatewayId: !Ref NatGatewayA
-  #   DependsOn: PrivateRouteTableA
+  PrivateRouteA:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableA
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayA
+    DependsOn: PrivateRouteTableA
 
   PrivateRouteTableB:
     Type: AWS::EC2::RouteTable
@@ -228,13 +228,13 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PrivatRouteTable B"
-  # PrivateRouteB:
-  #   Type: AWS::EC2::Route
-  #   Properties:
-  #     RouteTableId: !Ref PrivateRouteTableB
-  #     DestinationCidrBlock: 0.0.0.0/0
-  #     NatGatewayId: !Ref NatGatewayB
-  #   DependsOn: PrivateRouteTableB
+  PrivateRouteB:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableB
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayB
+    DependsOn: PrivateRouteTableB
 
   AppSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
