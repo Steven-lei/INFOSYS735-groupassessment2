@@ -96,3 +96,8 @@ Outputs:
     Value: !Ref ApplicationLoadBalancer
     Export:
       Name: !Sub "${AWS::StackName}-LoadBalancerArn"
+  PublicDNSName:
+    Description: DNS Name of the Load Balancer
+    Value: !Sub "https://${namePrefix}.theflower.co.nz" # the subdomain name to access the ALB
+    Export:
+      Name: !Sub "${namePrefix}-DNSName"
