@@ -62,17 +62,17 @@ Resources:
           Value: !Sub "${namePrefix}-AutoScalingInstance"
           PropagateAtLaunch: true
 
-TrackingPolicy:
-  Type: AWS::AutoScaling::ScalingPolicy
-  Properties:
-    AutoScalingGroupName: !Ref AutoScalingGroup
-    PolicyType: TargetTrackingScaling
-    TargetTrackingConfiguration:
-      PredefinedMetricSpecification:
-        PredefinedMetricType: ASGAverageCPUUtilization
-      TargetValue: 50.0
-      Cooldown: 60
-      DisableScaleIn: false
+  TrackingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 50.0
+        Cooldown: 60
+        DisableScaleIn: false
 
 Outputs:
   TargetGroupARN:
