@@ -47,3 +47,6 @@ Outputs:
       Name: !Sub "${AWS::StackName}-LoadBalancerDNSName"
   LoadBalancerArn:
     Description: ARN of the Load Balancer
+    Value: !Ref ApplicationLoadBalancer
+    Export:
+      Name: !Sub "${AWS::StackName}-LoadBalancerArn"
