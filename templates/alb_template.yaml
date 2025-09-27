@@ -25,7 +25,7 @@ Resources:
       Name: !Sub "${namePrefix}-ALB"
       Subnets: !Ref SubnetIds
       SecurityGroups:
-        - !Ref LoadBalancerSecurityGroupId
+        - !Ref SecurityGroupId
       Scheme: internet-facing
       Tags:
         - Key: Name
