@@ -12,8 +12,8 @@ Parameters:
 
   repositoryUrl:
     Type: String
-    #GitURL: https://raw.githubusercontent.com/youruser/myrepo/main
-    #BucketURL: https://s3.amazonaws.com/your-bucket-name
+    #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
+    #BucketURL: https://anygroup-templates.s3.us-east-1.amazonaws.com
     Default: https://anygroup-templates.s3.us-east-1.amazonaws.com
     Description: S3 bucket URL where the nested stack templates are stored, such as https://s3.amazonaws.com/your-bucket-name
 
@@ -46,17 +46,29 @@ Resources:
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 
-  TargetGroupStack:
+  WebServerStack:
     DependsOn:
       - NetworkStack
-      - LaunchTemplateStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/target_group_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/webserver_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        networkStackName: !Ref NetworkStack
-        lanchTamplateStackName: !Ref LaunchTemplateStack
+        NetworkStackName: !Ref NetworkStack
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  # TargetGroupStack:
+  #   DependsOn:
+  #     - NetworkStack
+  #     - LaunchTemplateStack
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${repositoryUrl}/target_group_template.yaml"
+  #     Parameters:
+  #       namePrefix: !Ref namePrefix
+  #       networkStackName: !Ref NetworkStack
+  #       lanchTamplateStackName: !Ref LaunchTemplateStack
 
   # DBStack:
   #   Type: AWS::CloudFormation::Stack

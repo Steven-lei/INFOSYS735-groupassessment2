@@ -5,6 +5,10 @@ Metadata:
   Owner: "Group 15"
 
 Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
   LatestAmiId:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
     Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
@@ -56,7 +60,7 @@ Resources:
           echo "<html><h1>Welcome to EC2 with Private IP: $(curl http://169.254.169.254/latest/meta-data/local-ipv4)</h1></html>" > /var/www/html/index.html
       Tags:
         - Key: Name
-          Value: WebServer
+          Value: !Sub ${namePrefix}-WebInstance
 Outputs:
   InstanceId:
     Description: EC2 Instance ID
