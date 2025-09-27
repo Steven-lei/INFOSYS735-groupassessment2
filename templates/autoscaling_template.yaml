@@ -72,8 +72,6 @@ Resources:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
         TargetValue: 50.0
-        ScaleOutCooldown: 60
-        ScaleInCooldown: 300
         DisableScaleIn: false
 
   # StepPolicy:
