@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Create a launchtemplate using existing AMI
+Description: Deoploy a multi-tier application architecture using nested CloudFormation stacks.
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15

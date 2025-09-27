@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: DB Stack with Subnet Group and RDS instance.
+Description: Create DBSubnetGroup, RDS instance for Oracle, and Save the credentials in Secrets Manager.
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15

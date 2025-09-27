@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create a WebServer in the public subnet
+Description: create a WebServer in the specified subnet
 Metadata:
   Comment: "This is a group project for course INFOSYS 735 group assessment2"
   Owner: "Group 15"

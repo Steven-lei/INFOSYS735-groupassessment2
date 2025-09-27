@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create a VPC with two app subnets and two db subnets, along with necessary route tables and internet gateway, for a multi-tier application architecture.
+Description: create security groups for ALB, APPs, and DB.
 Metadata:
   Comment: "This is a group project for course INFOSYS 735 group assessment2"
   Owner: "Group 15"

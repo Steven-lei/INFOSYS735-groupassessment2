@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Create an application Load balancer.
+Description: Create an application Load balancer using specific target group.
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15
