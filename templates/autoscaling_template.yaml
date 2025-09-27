@@ -10,15 +10,22 @@ Parameters:
     Default: AnyGroup
     Description: Prefix for resource names
 
-  networkStackName:
-    Type: String
-    Default: network
-    Description: Name of the network stack to import VPC and subnet details from
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the target group will be created
 
-  lanchTamplateStackName:
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs where the target group will be used
+
+  LaunchTemplateId:
     Type: String
-    Default: launchtemplate
-    Description: Name of the launch template stack to import Launch Template details from
+    Description: ID of the launch template to be used for the Auto Scaling group
+
+  LaunchTemplateVersion:
+    Type: String
+    Description: Version of the launch template to be used for the Auto Scaling group
+
 Resources:
   AppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -26,8 +33,7 @@ Resources:
       Name: !Sub "${namePrefix}-AppTargetGroup"
       Port: 80
       Protocol: HTTP
-      VpcId: !ImportValue
-        "Fn::Sub": "${networkStackName}-MainVPCId" # Importing VPC ID from VPCStack
+      VpcId: !Ref VPCId
       HealthCheckPath: /
       HealthCheckIntervalSeconds: 10
       HealthCheckTimeoutSeconds: 5
@@ -37,20 +43,17 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-AppTargetGroup"
+
   AutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${namePrefix}-AutoScalingGroup"
-      VPCZoneIdentifier:
-        - !ImportValue
-          "Fn::Sub": "${networkStackName}-PublicSubnetAId" # Importing Public Subnet A ID from VPCStack
-        - !ImportValue
-          "Fn::Sub": "${networkStackName}-PublicSubnetBId" # Importing Public Subnet B ID from VPCStack
+      VPCZoneIdentifier: !Ref SubnetIds
+      TargetGroupARNs:
+        - !Ref AppTargetGroup
       LaunchTemplate:
-        LaunchTemplateId: !ImportValue
-          "Fn::Sub": "${lanchTamplateStackName}-WebLaunchTemplateId" # Importing Launch Template ID from LaunchTemplateStack
-        Version: !ImportValue
-          "Fn::Sub": "${lanchTamplateStackName}-WebLaunchTemplateVersion" # Importing Launch Template Version from LaunchTemplateStack
+        LaunchTemplateId: !Ref LaunchTemplateId
+        Version: !Ref LaunchTemplateVersion
       MinSize: 1
       MaxSize: 3
       DesiredCapacity: 2

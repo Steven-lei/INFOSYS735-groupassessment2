@@ -33,14 +33,21 @@ Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/network_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/network_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/security_group_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.MainVPCId
 
   LaunchTemplateStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/launch_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/launch_template.yaml"
       Parameters:
         InstanceType: t2.micro
         KeyName: !Ref KeyName
@@ -51,25 +58,28 @@ Resources:
       - NetworkStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/webserver_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        SubnetId: !ImportValue "NetworkStack-PublicSubnetAId"
-        SecurityGroup: !ImportValue "NetworkStack-LoadBalancerSecurityGroupId"
+        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-  # TargetGroupStack:
-  #   DependsOn:
-  #     - NetworkStack
-  #     - LaunchTemplateStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/target_group_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       networkStackName: !Ref NetworkStack
-  #       lanchTamplateStackName: !Ref LaunchTemplateStack
+  AutoScalingStack:
+    DependsOn:
+      - NetworkStack
+      - LaunchTemplateStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          - !GetAtt NetworkStack.Outputs.PublicSubnetAId
+          - !GetAtt NetworkStack.Outputs.PublicSubnetBId
+        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
 
   # DBStack:
   #   Type: AWS::CloudFormation::Stack

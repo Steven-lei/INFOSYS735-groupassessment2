@@ -15,7 +15,7 @@ Parameters:
   SubnetId:
     Type: AWS::EC2::Subnet::Id
     Description: Subnet ID where the EC2 instance will be launched
-  SecurityGroup:
+  SecurityGroupId:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security Group ID to associate with the EC2 instance
   InstanceType:
@@ -47,7 +47,8 @@ Resources:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
           SubnetId: !Ref SubnetId
-          GroupSet: !Ref SecurityGroup
+          GroupSet:
+            - !Ref SecurityGroupId
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
