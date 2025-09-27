@@ -105,7 +105,7 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
         TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
-        CertificateArn: arn:aws:acm:us-east-1:123456789012:certificate/abcd1234-ab12-cd34-ef56-abcdef123456 # Replace with your ACM Certificate ARN
+        CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
         HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
 
 

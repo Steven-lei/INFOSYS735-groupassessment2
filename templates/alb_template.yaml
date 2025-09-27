@@ -83,7 +83,6 @@ Resources:
         DNSName: !GetAtt ApplicationLoadBalancer.DNSName
         HostedZoneId: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
         EvaluateTargetHealth: false
-      TTL: 300
 
 Outputs:
   LoadBalancerDNSName:
