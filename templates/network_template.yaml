@@ -258,49 +258,14 @@ Resources:
     Properties:
       SubnetId: !Ref DbSubnetB
       RouteTableId: !Ref PrivateRouteTableB
-  SecurityGroupLoadALB:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable HTTPS from everywhere
-      VpcId: !Ref MainVPC
-      SecurityGroupIngress:
-        #allowing HTTP from anywhere
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0 # Allow HTTP from anywhere
-        #allowing HTTPS from anywhere
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0 # Allow HTTPS from anywhere
-  SecurityGroupApp:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable HTTP from ALB SG only
-      VpcId: !Ref MainVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          SourceSecurityGroupId: !Ref SecurityGroupLoadALB # Allow HTTP from Load Balancer SG
-  SecurityGroupDb:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable Oracle from App SG only
-      VpcId: !Ref MainVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 1521
-          ToPort: 1521
-          SourceSecurityGroupId: !Ref SecurityGroupApp # Allow MySQL/Aurora from App SG
+
 Outputs:
   #export VPC and subnet IDs for use in other stacks
   VPCId:
     Description: VPC ID
     Value: !Ref MainVPC
     Export:
-      Name: !Sub "${AWS::StackName}-MainVPCId"
+      Name: !Sub "${AWS::StackName}-VPCId"
   PublicSubnetAId:
     Description: Public Subnet A ID
     Value: !Ref PublicSubnetA
@@ -331,19 +296,3 @@ Outputs:
     Value: !Ref DbSubnetB
     Export:
       Name: !Sub "${AWS::StackName}-DbSubnetBId"
-  #export security group IDs for use in other stacks
-  LoadBalancerSecurityGroupId:
-    Description: Security Group ID for Load Balancer
-    Value: !Ref SecurityGroupLoadALB
-    Export:
-      Name: !Sub "${AWS::StackName}-LoadBalancerSecurityGroupId"
-  AppSecurityGroupId:
-    Description: Security Group ID for App Servers
-    Value: !Ref SecurityGroupApp
-    Export:
-      Name: !Sub "${AWS::StackName}-AppSecurityGroupId"
-  DbSecurityGroupId:
-    Description: Security Group ID for Database Servers
-    Value: !Ref SecurityGroupDb
-    Export:
-      Name: !Sub "${AWS::StackName}-DbSecurityGroupId"

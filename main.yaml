@@ -67,15 +67,12 @@ Resources:
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
   AutoScalingStack:
-    DependsOn:
-      - NetworkStack
-      - LaunchTemplateStack
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        VPCId: !GetAtt NetworkStack.Outputs.MainVPCId
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
         SubnetIds:
           - !GetAtt NetworkStack.Outputs.PublicSubnetAId
           - !GetAtt NetworkStack.Outputs.PublicSubnetBId
