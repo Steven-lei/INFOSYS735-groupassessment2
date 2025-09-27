@@ -90,6 +90,8 @@ In Academy Learn Lab or any CLI environment:
 
 ## create s3 bucket to hold the templates
 
+# anygroup-templates is the bucketname
+
 3. s3api create-bucket --bucket anygroup-templates --query "Location" --output text
 
 ## upload to S3 bucket

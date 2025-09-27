@@ -65,15 +65,29 @@ Resources:
   TrackingPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
+      PolicyName: !Sub "${namePrefix}-TrackingPolicy"
       AutoScalingGroupName: !Ref AutoScalingGroup
       PolicyType: TargetTrackingScaling
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
         TargetValue: 50.0
-        Cooldown: 60
+        ScaleOutCooldown: 60
+        ScaleInCooldown: 300
         DisableScaleIn: false
 
+  # StepPolicy:
+  #   Type: AWS::AutoScaling::ScalingPolicy
+  #   Properties:
+  #     AutoScalingGroupName: !Ref AutoScalingGroup
+  #     PolicyType: StepScaling
+  #     AdjustmentType: ChangeInCapacity
+  #     StepAdjustments:
+  #       - MetricIntervalLowerBound: 70
+  #         ScalingAdjustment: 1 # CPU > 70%，add 1 instance
+  #       - MetricIntervalUpperBound: 30
+  #         ScalingAdjustment: -1 # CPU < 30%，remove 1 instance
+  #     Cooldown: 60
 Outputs:
   TargetGroupARN:
     Description: The ARN of the target group
