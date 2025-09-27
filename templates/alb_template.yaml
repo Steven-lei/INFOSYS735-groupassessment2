@@ -9,9 +9,6 @@ Parameters:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
-  VPCId:
-    Type: AWS::EC2::VPC::Id
-    Description: VPC ID where the load balancer will be created
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: List of Subnet IDs where the load balancer will be created
