@@ -12,7 +12,7 @@ Parameters:
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: List of Subnet IDs where the load balancer will be created
-  LoadBalancerSecurityGroupId:
+  SecurityGroupId:
     Type: String
     Description: Security Group ID for the Load Balancer
   TargetGroupArn:
