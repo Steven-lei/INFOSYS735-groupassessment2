@@ -15,6 +15,7 @@ This project automates infrastructure deployment using **AWS CloudFormation** fo
 
 - Automate the deployment of network and database infrastructure using CloudFormation.
 - Ensure security and scalability by configuring VPCs, subnets, route tables, NAT gateways, and security groups.
+- Implement HTTPS access by deploying LaunchTemplate, AutoScaling Group, Load Balancer, using certificate from ACM
 - Deploy an RDS Oracle instance with secure credentials managed in AWS Secrets Manager.
 
 ## Modules
@@ -36,9 +37,9 @@ This template sets up the core network infrastructure.
 
 - Configure Security Groups:
 
-  - ALB: allow HTTPS (443) from anywhere
-  - APP: allow HTTP (80) from ALB Security Group
-  - RDS: allow Oracle port (1521) from APP Security Group
+  - ALB: allow HTTP(80) from anywhere, allow HTTPS (443) from anywhere
+  - APP: allow HTTP (80) from ALB Security Group only
+  - RDS: allow Oracle port (1521) from APP Security Group only
 
   - Outputs: Security Group IDs.
 
@@ -86,7 +87,7 @@ This template uses the Network Template as a nested stack and provisions databas
 
 In Academy Learn Lab or any CLI environment:
 
-## prerequisite
+## deployment
 
 - clone cloudformation template
   git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
