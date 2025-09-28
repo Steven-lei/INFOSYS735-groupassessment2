@@ -88,26 +88,25 @@ In Academy Learn Lab or any CLI environment:
 
 ## prerequisite
 
-## clone cloudformation template
+- clone cloudformation template
+  git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
 
-1. git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
+- change directory
 
-## change directory
+  cd INFOSYS735-groupassessment2/
 
-2. cd INFOSYS735-groupassessment2/
+- create s3 bucket to hold the templates
 
-## create s3 bucket to hold the templates
+- anygroup-templates is the bucketname
 
-# anygroup-templates is the bucketname
+  s3api create-bucket --bucket anygroup-templates --query "Location" --output text
 
-3. s3api create-bucket --bucket anygroup-templates --query "Location" --output text
+- upload to S3 bucket
 
-## upload to S3 bucket
+  aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
 
-4. aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
+- deploy with main.yaml (the others are nested and will be run automatically)
 
-## run main.yaml (the others are nested and will be run automatically)
+  Deploy the main.yaml from Console or using the following CLI command
 
-5. Deploy the main.yaml from Console or using the following CLI command
-
-eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+  eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
