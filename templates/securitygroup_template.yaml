@@ -29,6 +29,9 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0 # Allow HTTPS from anywhere
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-LoadBalancerSG"
   SecurityGroupApp:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -39,6 +42,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref SecurityGroupLoadALB # Allow HTTP from Load Balancer SG
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-AppSG"
   SecurityGroupDb:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -49,6 +55,10 @@ Resources:
           FromPort: 1521
           ToPort: 1521
           SourceSecurityGroupId: !Ref SecurityGroupApp # Allow MySQL/Aurora from App SG
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-DbSG"
+
 Outputs:
   #export security group IDs for use in other stacks
   LoadBalancerSecurityGroupId:

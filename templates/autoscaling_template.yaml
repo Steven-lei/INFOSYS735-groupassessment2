@@ -30,7 +30,7 @@ Resources:
   AppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub "${namePrefix}-AppTargetGroup"
+      Name: !Sub "${namePrefix}-AppTG-${AWS::StackName}" #to be unique so that I can create with different stackName
       Port: 80
       Protocol: HTTP
       VpcId: !Ref VPCId
