@@ -40,19 +40,19 @@ This template sets up the core network infrastructure.
 
 ### 2. SecurityGroup Template
 
-- Configure Security Groups:
+Configure Security Groups:
 
-  - ALB: allow HTTP(80) from anywhere, allow HTTPS (443) from anywhere
-  - APP: allow HTTP (80) from ALB Security Group only
-  - RDS: allow Oracle port (1521) from APP Security Group only
+- ALB: allow HTTP(80) from anywhere, allow HTTPS (443) from anywhere
+- APP: allow HTTP (80) from ALB Security Group only
+- RDS: allow Oracle port (1521) from APP Security Group only
 
-  - Outputs: Security Group IDs.
+- Outputs: Security Group IDs.
 
 ### 3. LaunchTemplate Template
 
 - Create a LaunchTemplate using specific ImageID:
 
-  - Outputs: LaunchTemplateId, Version for AutoScaling Group.
+- Outputs: LaunchTemplateId, Version for AutoScaling Group.
 
 ### 4. Autoscaling Template
 
@@ -80,36 +80,31 @@ This template uses the Network Template as a nested stack and provisions databas
 - Deploy an RDS Oracle instance with the DB Security Group from the Network Template.
 - Outputs: RDS Endpoint, RDS Port
 
-##
-
-##
-
 ## Deployment Instructions
 
-##
-
-##
+Environment:
 
 In Academy Learn Lab or any CLI environment:
 
-## deployment
+## Steps
 
 - clone cloudformation template
-  git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
+
+  **git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git**
 
 - change directory
 
-  cd INFOSYS735-groupassessment2/
+  **cd INFOSYS735-groupassessment2/**
 
 - create s3 bucket to hold the templates
 
-- anygroup-templates is the bucketname
+  **s3api create-bucket --bucket anygroup-templates --query "Location" --output text**
 
-  s3api create-bucket --bucket anygroup-templates --query "Location" --output text
+  _anygroup-templates is the bucketname_
 
 - upload to S3 bucket
 
-  aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
+  **aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"**
 
 - deploy with main.yaml (the others are nested and will be run automatically)
 
