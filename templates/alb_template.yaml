@@ -30,7 +30,7 @@ Resources:
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub "${namePrefix}-ALB-${AWS::StackName:0:8}" #to be unique so that I can create with different stackName
+      Name: !Sub "${namePrefix}-ALB"
       Subnets: !Ref SubnetIds
       SecurityGroups:
         - !Ref SecurityGroupId
