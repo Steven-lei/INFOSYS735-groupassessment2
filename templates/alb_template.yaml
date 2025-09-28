@@ -63,9 +63,6 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroupArn
-      Tags:
-        - Key: Name
-          Value: !Sub "${namePrefix}-ALBHttpsListener"
 
   # Update the A record to point to the ALB
   AliasRecord:
