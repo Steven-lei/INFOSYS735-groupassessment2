@@ -30,7 +30,7 @@ Resources:
   AppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub "${namePrefix}-AppTG}"
+      Name: !Sub "${namePrefix}-AppTG"
       Port: 80
       Protocol: HTTP
       VpcId: !Ref VPCId
