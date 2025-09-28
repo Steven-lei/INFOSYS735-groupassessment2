@@ -67,6 +67,7 @@ Resources:
   # Update the A record to point to the ALB
   AliasRecord:
     Type: AWS::Route53::RecordSet
+    DependsOn: ApplicationLoadBalancer
     Properties:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub "${namePrefix}.theflower.co.nz" # the record name
