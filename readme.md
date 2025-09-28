@@ -57,7 +57,13 @@ This template sets up the core network infrastructure.
 
 - Create a Webserver in Public Subnet(can be used to create golden image)
 
-### 6. DB Template
+### 6. Application Load Balancer
+
+- Create Application Load Balancer using certificate from ACM(need to be precreated)
+- Create ALB Listener for HTTP, HTTPS
+- Create A record pointed to the LoadBalancer to valid https://anygroup.theflower.co.nz
+
+### 7. DB Template
 
 This template uses the Network Template as a nested stack and provisions database resources.
 
@@ -79,6 +85,8 @@ This template uses the Network Template as a nested stack and provisions databas
 ##
 
 In Academy Learn Lab or any CLI environment:
+
+## prerequisite
 
 ## clone cloudformation template
 
