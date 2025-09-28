@@ -17,6 +17,11 @@ This project automates infrastructure deployment using **AWS CloudFormation** fo
 - Ensure security and scalability by configuring VPCs, subnets, route tables, NAT gateways, and security groups.
 - Implement HTTPS access by deploying LaunchTemplate, AutoScaling Group, Load Balancer, using certificate from ACM
 - Deploy an RDS Oracle instance with secure credentials managed in AWS Secrets Manager.
+- SNS notification for server stop
+- S3 for website frontend
+- API gateway
+- Gateway Endpoint allowing securing access S3 and RDS
+- a simple website(backend) with Oracle DB connection
 
 ## Modules
 
@@ -58,7 +63,7 @@ This template sets up the core network infrastructure.
 
 - Create a Webserver in Public Subnet(can be used to create golden image)
 
-### 6. Application Load Balancer
+### 6. ALB template
 
 - Create Application Load Balancer using certificate from ACM(need to be precreated)
 - Create ALB Listener for HTTP, HTTPS

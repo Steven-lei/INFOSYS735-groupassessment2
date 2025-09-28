@@ -30,6 +30,9 @@ Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+  EC2InstanceProfile:
+    Type: String
+    Description: IAM Instance Profile Name for the EC2 instances
 Mappings:
   RegionMap:
     us-east-1:
@@ -43,6 +46,8 @@ Resources:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName #!FindInMap [RegionMap, !Ref "AWS::Region", keypair]
       ImageId: !Ref LatestAmiId
+      IamInstanceProfile:
+        Name: !Ref EC2InstanceProfile
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0

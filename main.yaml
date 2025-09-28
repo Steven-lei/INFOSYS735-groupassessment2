@@ -29,6 +29,10 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Password for the RDS instance
+  EC2InstanceProfile:
+    Type: String
+    Description: IAM Instance Profile Name for the EC2 instances
+    Value: LabInstanceProfile
 Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
@@ -54,20 +58,20 @@ Resources:
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
-
-  # WebServerStack:
-  #   DependsOn:
-  #     - NetworkStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-  #       InstanceType: t2.micro
-  #       KeyName: !Ref KeyName
-  #       LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        EC2InstanceProfile: !Ref EC2InstanceProfile
+  WebServerStack:
+    DependsOn:
+      - NetworkStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
   AutoScalingStack:
     Type: AWS::CloudFormation::Stack
     Properties:
