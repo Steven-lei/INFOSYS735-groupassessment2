@@ -46,8 +46,7 @@ Resources:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName #!FindInMap [RegionMap, !Ref "AWS::Region", keypair]
       ImageId: !Ref LatestAmiId
-      IamInstanceProfile:
-        Name: !Ref EC2InstanceProfile
+      IamInstanceProfile: !Ref EC2InstanceProfile
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
