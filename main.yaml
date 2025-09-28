@@ -73,61 +73,61 @@ Resources:
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
         EC2InstanceProfile: !Ref EC2InstanceProfile
-  # AutoScalingStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.AppSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.AppSubnetBId,
-  #           ],
-  #         ]
-  #       LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
-  #       LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn:
-  #     - NetworkStack
-  #     - SecurityGroupStack
-  #     - AutoScalingStack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/alb_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.PublicSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.PublicSubnetBId,
-  #           ],
-  #         ]
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-  #       TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
-  #       CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
-  #       HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
+  AutoScalingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
+        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+  ALBStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - NetworkStack
+      - SecurityGroupStack
+      - AutoScalingStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/alb_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+        TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
+        CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
+        HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
 
-  # DBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: NetworkStack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.DbSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.DbSubnetBId,
-  #           ],
-  #         ]
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-  #       DBUsername: !Ref DBUsername
-  #       DBPassword: !Ref DBPassword
+  DBStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.DbSubnetAId,
+              !GetAtt NetworkStack.Outputs.DbSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
+        DBUsername: !Ref DBUsername
+        DBPassword: !Ref DBPassword
