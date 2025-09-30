@@ -110,15 +110,46 @@ In Academy Learn Lab or any CLI environment:
 
   Deploy the main.yaml from Console or using the following CLI command
 
-  eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+### To create a webserver allowing to create golden image
 
-  aws cloudformation create-stack \
-   --stack-name MyStack \
-   --template-body file://template.yaml \
-   --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+using the s3 url:
+https://anygroup-templates.s3.us-east-1.amazonaws.com/webserver.yaml
 
-  To create the whole environment using the s3 url:
-  https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+1. create subnets without NAT gateway
+2. create webserver in public subnet with IAM role
+3. create securitygroup allowing HTTP, HTTPS, SSH from specific IP address
+   after successfully deployment, shall be able to access the EC2 through SSM or SSH
 
-  To create a webserver allowing to create golden image using the s3 url:
-  https://anygroup-templates.s3.us-east-1.amazonaws.com/webserver.yaml
+### To create a simplified infrastructure
+
+1. create network infrastructure, one NAT gateway to save cost
+2. create launchtemplate using golden image (an AMI image with HTTPs installed by default)
+3. create autoscaling group using launchtemplate
+4. create targetgroup using autoscaling group
+5. create load balancer using target group
+6. create RDS in single AZ(optional)
+7. the RDS credential will be stored in Secrets Manager after creation
+   After successfully deployment, shall be able to access the loadbalancer using AWS subdomain
+
+### deploy the whole infrastructure using specific golden image
+
+1. create network infrastructure, one NAT gateway in each AZ
+2. create launchtemplate using golden image
+3. create autoscaling group using launchtemplate
+4. create targetgroup using autoscaling group
+5. create load balancer using target group
+6. create Listener using loadbalancer and ACM
+7. update the domain record pointed to the Load Balancer
+8. deploy database in Multi-AZ
+   After successfully deploy, shall be able to access https://anygroup.theflower.co.nz
+9. the RDS credential will be stored in Secrets Manager after creation
+
+eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+
+aws cloudformation create-stack \
+ --stack-name MyStack \
+ --template-body file://template.yaml \
+ --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+
+To create the whole environment using the s3 url:
+https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml

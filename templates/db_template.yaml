@@ -3,6 +3,14 @@ Description: Create DBSubnetGroup, RDS instance for Oracle, and Save the credent
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
   Owner: Group 15
+
+Conditions:
+  EnvProd: !Equals [!Ref EnvType, "prod"]
+  EnvDev: !Equals [!Ref EnvType, "dev"]
+  EnvTest: !And
+    - !Not [!Condition Env-Prod]
+    - !Not [!Condition Env-Dev]
+
 Parameters:
   #Prefix for resource names
   namePrefix:
@@ -30,6 +38,13 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Password for the RDS instance
+
+  EnvType:
+    Type: String
+    Default: "dev"
+    Description: |
+      dev: deploy the RDS with single AZ
+      prod: deploy the RDS with Multi-AZ
 Resources:
   #Create secret in Secrets Manager to store RDS credentials, dbhost, dbport, dbname,and dburl will be added automatically
   DBSecret:
@@ -71,8 +86,8 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
         - !Ref SecurityGroupId
-      MultiAZ: false
-      PubliclyAccessible: false # RDS instance is not publicly accessible
+      MultiAZ: !If [EnvProd, true, false] #allowing Muti-AZ in Product environment
+      PubliclyAccessible: !If [EnvTest, true, false] # allowing public access for test
       DeletionProtection: false
       #BackupRetentionPeriod: 7 # Enable automated backups with a retention period of 7 days
       #PreferredBackupWindow: "03:00-04:00" # Set preferred backup window
