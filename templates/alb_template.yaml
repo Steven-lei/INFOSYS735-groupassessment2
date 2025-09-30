@@ -23,9 +23,15 @@ Parameters:
   HostedZoneId:
     Type: String
     Description: Route53 Hosted Zone ID for the domain
+    Default: ""
   CertificateArn:
     Type: String
     Description: ACM Certificate ARN for HTTPS listener
+    Default: ""
+
+Conditions:
+  AllowingHTTPS: !NOT [!Equals [!Ref CertificateArn, ""]]
+  UpdateDNS: !NOT [!Equals [!Ref HostedZoneId, ""]]
 Resources:
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -42,17 +48,20 @@ Resources:
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref TargetGroupArn
-      # DefaultActions:
-      #   - Type: redirect
-      #     RedirectConfig:
-      #       Protocol: HTTPS
-      #       Port: "443"
-      #       StatusCode: HTTP_301
+      DefaultActions: !If
+        - AllowingHTTPS
+        -
+          - Type: redirect
+            RedirectConfig:
+              Protocol: HTTPS
+              Port: "443"
+              StatusCode: HTTP_301
+        - 
+          - Type: forward
+           TargetGroupArn: !Ref TargetGroupArn
 
   ALBHttpsListener:
+    Condition: AllowingHTTPS
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref ApplicationLoadBalancer
@@ -66,6 +75,7 @@ Resources:
 
   # Update the A record to point to the ALB
   AliasRecord:
+    Condition: UpdateDNS
     Type: AWS::Route53::RecordSet
     DependsOn: ApplicationLoadBalancer
     Properties:
