@@ -40,95 +40,95 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/network_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        EnvType: test
-  SecurityGroupStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
-      Parameters:
-        namePrefix: !Ref namePrefix
-        VPCId: !GetAtt NetworkStack.Outputs.VPCId
-
-  # LaunchTemplateStack:
+        EnvType: prod
+  # SecurityGroupStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/launch_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       InstanceType: t2.micro
-  #       KeyName: !Ref KeyName
-  #       LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
-  #       EC2InstanceProfile: !Ref EC2InstanceProfile
-  WebServerStack:
-    DependsOn:
-      - NetworkStack
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
-      Parameters:
-        namePrefix: !Ref namePrefix
-        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
-        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-        InstanceType: t2.micro
-        KeyName: !Ref KeyName
-        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-        EC2InstanceProfile: !Ref EC2InstanceProfile
-  # AutoScalingStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+  #     TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
   #     Parameters:
   #       namePrefix: !Ref namePrefix
   #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.AppSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.AppSubnetBId,
-  #           ],
-  #         ]
-  #       LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
-  #       LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
+
+  LaunchTemplateStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/launch_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
+        EC2InstanceProfile: !Ref EC2InstanceProfile
+  # WebServerStack:
   #   DependsOn:
   #     - NetworkStack
-  #     - SecurityGroupStack
-  #     - AutoScalingStack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/alb_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.PublicSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.PublicSubnetBId,
-  #           ],
-  #         ]
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-  #       TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
-  #       CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
-  #       HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
-
-  # DBStack:
   #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: NetworkStack
   #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+  #     TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
   #     Parameters:
   #       namePrefix: !Ref namePrefix
-  #       SubnetIds:
-  #         !Join [
-  #           ",",
-  #           [
-  #             !GetAtt NetworkStack.Outputs.DbSubnetAId,
-  #             !GetAtt NetworkStack.Outputs.DbSubnetBId,
-  #           ],
-  #         ]
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-  #       DBUsername: !Ref DBUsername
-  #       DBPassword: !Ref DBPassword
+  #       SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
+  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+  #       InstanceType: t2.micro
+  #       KeyName: !Ref KeyName
+  #       LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  #       EC2InstanceProfile: !Ref EC2InstanceProfile
+  AutoScalingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/autoscaling_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
+        LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
+        LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+  ALBStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - NetworkStack
+      - SecurityGroupStack
+      - AutoScalingStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/alb_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+        TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
+        CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
+        HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
+
+  DBStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.DbSubnetAId,
+              !GetAtt NetworkStack.Outputs.DbSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
+        DBUsername: !Ref DBUsername
+        DBPassword: !Ref DBPassword

@@ -116,3 +116,9 @@ In Academy Learn Lab or any CLI environment:
    --stack-name MyStack \
    --template-body file://template.yaml \
    --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+
+  To create the whole environment using the s3 url:
+  https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+
+  To create a webserver allowing to create golden image using the s3 url:
+  https://anygroup-templates.s3.us-east-1.amazonaws.com/webserver.yaml
