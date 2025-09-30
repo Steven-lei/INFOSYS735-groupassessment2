@@ -12,6 +12,10 @@ Parameters:
   VPCId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the security group will be created
+  MyIP:
+    Type: String
+    Description: Your IP address in CIDR notation
+    Default: 0.0.0.0/0
 Resources:
   SecurityGroupLoadALB:
     Type: AWS::EC2::SecurityGroup
@@ -59,6 +63,17 @@ Resources:
         - Key: Name
           Value: !Sub "${namePrefix}-DbSG"
 
+  SecurityGroupSSH:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH from anywhere
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        #allowing SSH from specific IP range
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MyIP # Allow SSH from your IP
 Outputs:
   #export security group IDs for use in other stacks
   LoadBalancerSecurityGroupId:
@@ -76,3 +91,9 @@ Outputs:
     Value: !Ref SecurityGroupDb
     Export:
       Name: !Sub "${AWS::StackName}-DbSecurityGroupId"
+
+  SSHSecurityGroupId:
+    Description: Security Group ID for SSH Access
+    Value: !Ref SecurityGroupSSH
+    Export:
+      Name: !Sub "${AWS::StackName}-SSHSecurityGroupId"
