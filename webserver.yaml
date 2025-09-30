@@ -38,7 +38,7 @@ Parameters:
     Default: "no"
     AllowedValues: ["yes", "no"]
     Description: |
-      Whether to create a RDS database with dbadmin and P@ssw0rd123
+      Whether to create a RDS database with dbadmin and P#ssw0rd123
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
 
@@ -59,8 +59,6 @@ Resources:
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
 
   WebServerStack:
-    DependsOn:
-      - NetworkStack
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
@@ -86,15 +84,14 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        SubnetIds:
-          !Join [
+        SubnetIds: !Join [
             ",",
             [
-              !GetAtt NetworkStack.Outputs.DbSubnetAId,
-              !GetAtt NetworkStack.Outputs.DbSubnetBId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId, #create the DB in public subnet for easy debugging
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId, #create the DB in public subnet for easy debugging
             ],
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
         DBUsername: "dbadmin"
-        DBPassword: "P@ssw0rd123"
+        DBPassword: "P#ssw0rd123"
         EnvType: "test"
