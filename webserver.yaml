@@ -53,7 +53,8 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
-        SecurityGroupIds:
+        SecurityGroupIds: !Join
+          - ","
           - !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
           - !GetAtt SecurityGroupStack.Outputs.SSHSecurityGroupId
         InstanceType: t2.micro
