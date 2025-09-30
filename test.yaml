@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Deoploy a multi-tier application architecture using nested CloudFormation stacks.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Conditions: {
+  CreateDB: !Equals [!Ref EnvType, "Create WebServer with DB"]
+}
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  EnvType:
+    Type: String
+    AllowedValues:
+      - "Create WebServer Only"
+      - "Create WebServer with DB"
+    Default: "Create WebServer Only"
+    Description: "Type of environment to deploy 
+    Create WebServer Only: create a VPC only in public subnet, allowing for creating golden image
+    Create WebServer with DB: create a VPC with public and private subnets, deploy a 2-tier application with web server and RDS database"
+  repositoryUrl:
+    Type: String
+    #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
+    #BucketURL: https://anygroup-templates.s3.us-east-1.amazonaws.com
+    Default: https://anygroup-templates.s3.us-east-1.amazonaws.com
+    Description: S3 bucket URL where the nested stack templates are stored, such as https://s3.amazonaws.com/your-bucket-name
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Default: vockey
+  DBUsername:
+    Type: String
+    Default: dbadmin
+    Description: Username for the RDS instance
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for the RDS instance
+  EC2InstanceProfile:
+    Type: String
+    Description: IAM Instance Profile Name for the EC2 instances
+    Default: LabInstanceProfile
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/network_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+
+  WebServerStack:
+    DependsOn:
+      - NetworkStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        EC2InstanceProfile: !Ref EC2InstanceProfile
+  
+  DBStack:
+    Type: AWS::CloudFormation::Stack
+    Conditions: CreateDB
+    DependsOn: NetworkStack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.DbSubnetAId,
+              !GetAtt NetworkStack.Outputs.DbSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
+        DBUsername: !Ref DBUsername
+        DBPassword: !Ref DBPassword

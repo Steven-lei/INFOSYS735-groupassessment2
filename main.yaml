@@ -41,13 +41,13 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         EnvType: test
-  # SecurityGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
 
   # LaunchTemplateStack:
   #   Type: AWS::CloudFormation::Stack

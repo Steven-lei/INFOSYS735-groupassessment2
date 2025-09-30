@@ -111,3 +111,8 @@ In Academy Learn Lab or any CLI environment:
   Deploy the main.yaml from Console or using the following CLI command
 
   eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+
+  aws cloudformation create-stack \
+   --stack-name MyStack \
+   --template-body file://template.yaml \
+   --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND

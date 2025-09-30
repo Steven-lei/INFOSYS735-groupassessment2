@@ -1,15 +1,51 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: create a VPC with two public subnets, two app subnets and two db subnets, along with necessary route tables and internet gateway, for a multi-tier application architecture.
+Description: |
+  create a VPC with two public subnets, two app subnets and two db subnets, along with necessary route tables and internet gateway, for a multi-tier application architecture.
+  support options for creating natgateway
 Metadata:
   Comment: "This is a group project for course INFOSYS 735 group assessment2"
   Owner: "Group 15"
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Basic Configuration"
+        Parameters:
+          - namePrefix
+          - EnvType
+      - Label:
+          default: "Network Configuration"
+        Parameters:
+          - VpcCidr
+          - publicSubnetACidr
+          - publicSubnetBCidr
+          - appSubnetACidr
+          - appSubnetBCidr
+          - dbSubnetACidr
+          - dbSubnetBCidr
+Conditions:
+  CreateNatA:
+    !Or [!Equals [!Ref EnvType, "dev"], !Equals [!Ref EnvType, "prod"]]
+  CreateNatB: !Equals [!Ref EnvType, "prod"]
+  UseNatAOnly: !And [!Condition CreateNatA, !Not [!Condition CreateNatB]]
 Parameters:
   #CIDR blocks for VPC and subnets
   namePrefix:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
+  EnvType:
+    Type: String
+    Default: test
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: |
+      Environment type
+      - test: no NAT gateway, save cost, private subnets cannot access internet
+      - dev: one NAT gateway in the first AZ, private subnets can initially access internet
+      - prod: create gateway in each AZ, high availability for private subnets to access internet
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
@@ -56,6 +92,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-VPC"
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   #Internet Gateway definition
   MainIGW:
     Type: AWS::EC2::InternetGateway
@@ -63,7 +101,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-IGW"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   AttachIGW:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -73,41 +112,46 @@ Resources:
   #NAT gateways in two AZs
   NatEIPA:
     Type: AWS::EC2::EIP
-    DependsOn: AttachIGW
+    Condition: CreateNatA
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-NatEIP-A"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   NatGatewayA:
     Type: AWS::EC2::NatGateway
-    DependsOn: AttachIGW
+    Condition: CreateNatA
     Properties:
       AllocationId: !GetAtt NatEIPA.AllocationId
       SubnetId: !Ref PublicSubnetA
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-NatGateway-A"
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   NatEIPB:
     Type: AWS::EC2::EIP
-    DependsOn: AttachIGW
+    Condition: CreateNatB
     Properties:
       Domain: vpc
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-NatEIP-B"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   NatGatewayB:
     Type: AWS::EC2::NatGateway
-    DependsOn: AttachIGW
+    Condition: CreateNatB
     Properties:
       AllocationId: !GetAtt NatEIPB.AllocationId
       SubnetId: !Ref PublicSubnetB
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-NatGateway-B"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   #Two public subnets in different AZs
   PublicSubnetA:
     Type: AWS::EC2::Subnet
@@ -119,7 +163,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PublicSubnet A"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   PublicSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -130,7 +175,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PublicSubnet B"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   #Two App subnets in different AZs
   AppSubnetA:
     Type: AWS::EC2::Subnet
@@ -142,7 +188,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} App Subnet A"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   AppSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -153,7 +200,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} App Subnet B"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   #two Db subnets in different AZs
   DbSubnetA:
     Type: AWS::EC2::Subnet
@@ -165,6 +213,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} DB Subnet A"
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   DbSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -175,7 +225,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} DB Subnet B"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   #Public Route Table definition
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -184,14 +235,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PublicRouteTable"
-
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   PublicRoute:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref MainIGW
-    DependsOn: AttachIGW
 
   PublicSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -213,13 +264,15 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix} PrivateRouteTable A"
+        - Key: Environment
+          Value: !Sub "${EnvType}"
   PrivateRouteA:
     Type: AWS::EC2::Route
+    Condition: CreateNatA
     Properties:
       RouteTableId: !Ref PrivateRouteTableA
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGatewayA
-    DependsOn: PrivateRouteTableA
 
   PrivateRouteTableB:
     Type: AWS::EC2::RouteTable
@@ -227,14 +280,24 @@ Resources:
       VpcId: !Ref MainVPC
       Tags:
         - Key: Name
-          Value: !Sub "${namePrefix} PrivatRouteTable B"
-  PrivateRouteB:
+          Value: !Sub "${namePrefix} PrivateRouteTable B"
+        - Key: Environment
+          Value: !Sub "${EnvType}"
+  PrivateRouteBDev:
     Type: AWS::EC2::Route
+    Condition: UseNatAOnly
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableB
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayA
+
+  PrivateRouteBProd:
+    Type: AWS::EC2::Route
+    Condition: CreateNatB
     Properties:
       RouteTableId: !Ref PrivateRouteTableB
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGatewayB
-    DependsOn: PrivateRouteTableB
 
   AppSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
