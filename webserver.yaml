@@ -53,10 +53,14 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
-        SecurityGroupIds: !Join
-          - ","
-          - !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-          - !GetAtt SecurityGroupStack.Outputs.SSHSecurityGroupId
+        SecurityGroupIds: 
+          !Join [
+            - ","
+            [
+              !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId,
+              !GetAtt SecurityGroupStack.Outputs.SSHSecurityGroupId
+            ]
+          ]
         InstanceType: t2.micro
         KeyName: !Ref KeyName
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
