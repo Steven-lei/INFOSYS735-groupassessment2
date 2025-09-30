@@ -107,7 +107,6 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
         TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
-        EnvType: "dev"
   DBStack:
     Type: AWS::CloudFormation::Stack
     Condition: NeedDB
