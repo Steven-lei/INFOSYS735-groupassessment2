@@ -8,8 +8,8 @@ Conditions:
   EnvProd: !Equals [!Ref EnvType, "prod"]
   EnvDev: !Equals [!Ref EnvType, "dev"]
   EnvTest: !And
-    - !Not [!Condition Env-Prod]
-    - !Not [!Condition Env-Dev]
+    - !Not [!Condition EnvProd]
+    - !Not [!Condition EnvDev]
 
 Parameters:
   #Prefix for resource names
