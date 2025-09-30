@@ -41,13 +41,13 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         EnvType: prod
-  # SecurityGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       VPCId: !GetAtt NetworkStack.Outputs.VPCId
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/securitygroup_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
 
   LaunchTemplateStack:
     Type: AWS::CloudFormation::Stack
@@ -60,20 +60,7 @@ Resources:
         LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
         EC2InstanceProfile: !Ref EC2InstanceProfile
-  # WebServerStack:
-  #   DependsOn:
-  #     - NetworkStack
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${repositoryUrl}/templates/webserver_template.yaml"
-  #     Parameters:
-  #       namePrefix: !Ref namePrefix
-  #       SubnetId: !GetAtt NetworkStack.Outputs.PublicSubnetAId
-  #       SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
-  #       InstanceType: t2.micro
-  #       KeyName: !Ref KeyName
-  #       LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
-  #       EC2InstanceProfile: !Ref EC2InstanceProfile
+
   AutoScalingStack:
     Type: AWS::CloudFormation::Stack
     Properties:

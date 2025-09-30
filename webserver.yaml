@@ -11,7 +11,12 @@ Parameters:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
-
+  MyIP:
+    Type: String
+    Description: |
+      Your IP address in CIDR notation for SSH access
+      Fetch your IP from https://checkip.amazonaws.com/ and append /32 for single IP access
+    Default: 0.0.0.0/0
   repositoryUrl:
     Type: String
     #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
