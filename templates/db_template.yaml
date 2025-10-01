@@ -27,18 +27,6 @@ Parameters:
     Type: String
     Description: Security Group ID for the RDS instance
 
-  #DB username
-  DBUsername:
-    Type: String
-    Default: dbadmin
-    Description: Username for the RDS instance
-
-  #DB password
-  DBPassword:
-    Type: String
-    NoEcho: true
-    Description: Password for the RDS instance
-
   EnvType:
     Type: String
     Default: "dev"
@@ -52,11 +40,12 @@ Resources:
     Properties:
       Name: !Sub ${namePrefix}-RDSSecret
       Description: Secret for RDS instance credentials
-      SecretString: !Sub |
-        {
-          "username": "${DBUsername}",
-          "password": "${DBPassword}"
-        }
+      GenerateSecretString:
+        SecretStringTemplate: !Sub |
+          {"username": "dbadmin"}
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
       Tags:
         - Key: Name
           Value: !Sub ${namePrefix}-RDSSecret
@@ -80,8 +69,7 @@ Resources:
       Engine: oracle-se2
       EngineVersion: 19.0.0.0.ru-2025-07.rur-2025-07.r1
       LicenseModel: license-included
-      MasterUsername: !Ref DBUsername
-      MasterUserPassword: !Ref DBPassword
+      MasterUsername: dbadmin
       StorageEncrypted: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
@@ -95,7 +83,13 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${namePrefix}-RDSInstance
-
+  DBSecretAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref DBSecret
+      TargetId: !Ref RDSInstance
+      TargetType: AWS::RDS::DBInstance
+    DependsOn: RDSInstance
 Outputs:
   RDSEndpoint:
     Description: RDS endpoint address

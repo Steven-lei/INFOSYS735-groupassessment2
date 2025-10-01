@@ -38,7 +38,7 @@ Parameters:
     Default: "no"
     AllowedValues: ["yes", "no"]
     Description: |
-      Whether to create a RDS database with dbadmin and P#ssw0rd123
+      Whether to create a RDS database
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
 
@@ -92,6 +92,4 @@ Resources:
             ],
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-        DBUsername: "dbadmin"
-        DBPassword: "P#ssw0rd123"
         EnvType: "test"
