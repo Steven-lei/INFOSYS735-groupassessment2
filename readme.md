@@ -153,3 +153,7 @@ aws cloudformation create-stack \
 
 To create the whole environment using the s3 url:
 https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+
+testing oracle connection:
+sqlplus "dbadmin/.,'2iy6!;5<tX(F#@//anygroup-rdsinstance.crx8ulj2vvni.us-east-1.rds.amazonaws.com:1521/ORCL"
+replace the password and dbhost with the value from secrets manager
