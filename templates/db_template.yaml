@@ -70,6 +70,7 @@ Resources:
       EngineVersion: 19.0.0.0.ru-2025-07.rur-2025-07.r1
       LicenseModel: license-included
       MasterUsername: dbadmin
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DBSecret}:SecretString:password}}"
       StorageEncrypted: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
