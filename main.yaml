@@ -109,20 +109,20 @@ Resources:
         CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
         HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
 
-DBStack:
-  Type: AWS::CloudFormation::Stack
-  Condition: NeedDB
-  Properties:
-    TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
-    Parameters:
-      namePrefix: !Ref namePrefix
-      SubnetIds:
-        !Join [
-          ",",
-          [
-            !GetAtt NetworkStack.Outputs.DbSubnetAId,
-            !GetAtt NetworkStack.Outputs.DbSubnetBId,
-          ],
-        ]
-      SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-      EnvType: "prod"
+  DBStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: NeedDB
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.DbSubnetAId,
+              !GetAtt NetworkStack.Outputs.DbSubnetBId,
+            ],
+          ]
+        SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
+        EnvType: "prod"
