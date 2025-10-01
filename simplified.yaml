@@ -123,6 +123,4 @@ Resources:
             ],
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-        DBUsername: !Ref DBUsername
-        DBPassword: !Ref DBPassword
         EnvType: "dev"
