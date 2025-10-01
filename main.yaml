@@ -21,14 +21,6 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
     Default: vockey
-  DBUsername:
-    Type: String
-    Default: dbadmin
-    Description: Username for the RDS instance
-  DBPassword:
-    Type: String
-    NoEcho: true
-    Description: Password for the RDS instance
   EC2InstanceProfile:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances

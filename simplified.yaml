@@ -27,15 +27,6 @@ Parameters:
     Default: "no"
     AllowedValues: ["yes", "no"]
     Description: Whether to create a RDS database
-  DBUsername:
-    Type: String
-    Default: dbadmin
-    Description: Username for the RDS instance
-  DBPassword:
-    Type: String
-    NoEcho: true
-    Default: ""
-    Description: Password for the RDS instance(only used if CreateDB = yes)
   EC2InstanceProfile:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances
