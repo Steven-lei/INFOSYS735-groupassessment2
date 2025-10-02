@@ -141,10 +141,9 @@ https://anygroup-templates.s3.us-east-1.amazonaws.com/webserver.yaml
 6. create Listener using loadbalancer and ACM
 7. update the domain record pointed to the Load Balancer
 8. deploy database in Multi-AZ
-   After successfully deploy, shall be able to access https://anygroup.theflower.co.nz
 9. the RDS credential will be stored in Secrets Manager after creation
-
-eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
+   After successfully deploy, shall be able to access https://anygroup.theflower.co.nz
+   eg, run cloudformation with the s3 url: https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
 
 aws cloudformation create-stack \
  --stack-name MyStack \
