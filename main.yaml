@@ -98,8 +98,8 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
         TargetGroupArn: !GetAtt AutoScalingStack.Outputs.TargetGroupARN
-        CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/f1350f10-8401-4f9b-958d-8de131f8a9d1 # Replace with your ACM Certificate ARN
-        HostedZoneId: Z06101501G1V063D2WS5A # Replace with your Hosted Zone ID
+        CertificateArn: arn:aws:acm:us-east-1:003439931585:certificate/c3ca104d-ac6c-4146-a44b-4fa637af6720 # Replace with your ACM Certificate ARN
+        HostedZoneId: Z0741530369VSAX50NGX # Replace with your Hosted Zone ID
 
   DBStack:
     Type: AWS::CloudFormation::Stack
