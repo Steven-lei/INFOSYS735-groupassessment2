@@ -56,7 +56,7 @@ Resources:
       HealthCheckPath: /healthcheck.html
       HealthCheckIntervalSeconds: 10
       HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 3
+      HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
       TargetType: instance
       Tags:
@@ -73,9 +73,10 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateId
         Version: !Ref LaunchTemplateVersion
-      MinSize: 1
-      MaxSize: 3
+      MinSize: 2
+      MaxSize: 6
       DesiredCapacity: 2
+      HealthCheckGracePeriod: 30
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-AutoScalingInstance"
@@ -96,7 +97,7 @@ Resources:
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 50.0
+        TargetValue: 25.0
         DisableScaleIn: false
 
   # StepPolicy:
