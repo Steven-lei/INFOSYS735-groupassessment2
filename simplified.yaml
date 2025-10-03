@@ -41,6 +41,38 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         EnvType: dev
+  NACLStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/nacl_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        PublicSubnets:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId,
+            ],
+          ]
+        AppSubnets:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
+        DBSubnets:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.DBSubnetAId,
+              !GetAtt NetworkStack.Outputs.DBSubnetBId,
+            ],
+          ]
+
   SecurityGroupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
