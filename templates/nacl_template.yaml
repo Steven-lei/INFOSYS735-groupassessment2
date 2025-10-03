@@ -209,6 +209,7 @@ Resources:
     Properties:
       NetworkAclId: !Ref DBNACL
       SubnetId: ! Select[0, !Ref DBSubnets]
+
   DBSubnetBNaclAssociate:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
