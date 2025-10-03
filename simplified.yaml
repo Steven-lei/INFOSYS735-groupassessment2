@@ -65,12 +65,16 @@ Resources:
             ],
           ]
         DBSubnets:
-          !Join [
-            ",",
-            [
-              !GetAtt NetworkStack.Outputs.DBSubnetAId,
-              !GetAtt NetworkStack.Outputs.DBSubnetBId,
+          !If [
+            NeedDB,
+            !Join [
+              ",",
+              [
+                !GetAtt NetworkStack.Outputs.DBSubnetAId,
+                !GetAtt NetworkStack.Outputs.DBSubnetBId,
+              ],
             ],
+            !Ref AWS::NoValue,
           ]
 
   SecurityGroupStack:

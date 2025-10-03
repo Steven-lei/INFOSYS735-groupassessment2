@@ -33,6 +33,8 @@ Parameters:
     Description: Select the DB subnets
     Type: List<AWS::EC2::Subnet::Id>
     ConstraintDescription: "Must be a valid subnet ID"
+Conditions:
+  DBSubnetsExist: !Not [!Equals [!Join ["", !Ref DBSubnets], ""]]
 Resources:
   PublicNACL:
     Type: AWS::EC2::NetworkAcl
@@ -170,6 +172,7 @@ Resources:
   # Inbound rules
   # Allow ORACLE,MYSQL (1521,3306)
   DBNACLInboundHTTPOracle:
+    Condition: DBSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref DBNACL
@@ -183,6 +186,7 @@ Resources:
         To: 1521
 
   DBNACLInboundHTTPMySql:
+    Condition: DBSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref DBNACL
@@ -196,6 +200,7 @@ Resources:
         To: 3306
   # Allow all outbound
   DBNACLOutboundAllowAll:
+    Condition: DBSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref DBNACL
@@ -205,12 +210,14 @@ Resources:
       Egress: true
       CidrBlock: 0.0.0.0/0
   DBSubnetANaclAssociate:
+    Condition: DBSubnetsExist
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref DBNACL
       SubnetId: ! Select[0, !Ref DBSubnets]
 
   DBSubnetBNaclAssociate:
+    Condition: DBSubnetsExist
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref DBNACL
