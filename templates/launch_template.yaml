@@ -42,6 +42,8 @@ Resources:
           - !Ref SecurityGroupId
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
+        Monitoring:
+          Enabled: true
         #IamInstanceProfile: !Ref EC2InstanceProfile
         UserData:
           Fn::Base64: !Sub |
