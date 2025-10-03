@@ -104,7 +104,7 @@ _anygroup-templates is the bucketname_ it is globally unique, change it to an ap
 
 - upload to S3 bucket
 
-aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
+aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
 
 - deploy with main.yaml (the others are nested and will be run automatically)
 

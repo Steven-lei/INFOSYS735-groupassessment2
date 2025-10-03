@@ -81,7 +81,7 @@ Resources:
           Value: !Sub "${namePrefix}-AutoScalingInstance"
           PropagateAtLaunch: true
       NotificationConfigurations:
-        - TopicARN: !Ref MySNSTopic
+        - TopicARN: !Ref SNSTopic
           NotificationTypes:
             - autoscaling:EC2_INSTANCE_LAUNCH
             - autoscaling:EC2_INSTANCE_TERMINATE
