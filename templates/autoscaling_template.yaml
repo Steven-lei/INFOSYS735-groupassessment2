@@ -1,6 +1,9 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: create a targetGroup and then create an AutoScalingGroup using that targetGroup.
+Description: |
+  create a targetGroup and then create an AutoScalingGroup using that targetGroup.
+  create a SNS topic 
+  send email notification when autoscaling activity occurs.
 Metadata:
   Comment: "This is a group project for course INFOSYS 735 group assessment2"
   Owner: "Group 15"
@@ -26,7 +29,23 @@ Parameters:
     Type: String
     Description: Version of the launch template to be used for the Auto Scaling group
 
+  Email:
+    Type: String
+    Description: Email addresses for SNS notification
+    Default: "leizhengwen@126.com"
 Resources:
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${namePrefix}-SNS-Topic"
+
+  SNSTopicSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref SNSTopic
+      Protocol: email
+      Endpoint: !Ref Email
+
   AppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -61,7 +80,13 @@ Resources:
         - Key: Name
           Value: !Sub "${namePrefix}-AutoScalingInstance"
           PropagateAtLaunch: true
-
+      NotificationConfigurations:
+        - TopicARN: !Ref MySNSTopic
+          NotificationTypes:
+            - autoscaling:EC2_INSTANCE_LAUNCH
+            - autoscaling:EC2_INSTANCE_TERMINATE
+            - autoscaling:EC2_INSTANCE_LAUNCH_ERROR
+            - autoscaling:EC2_INSTANCE_TERMINATE_ERROR
   TrackingPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
