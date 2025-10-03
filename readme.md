@@ -90,21 +90,21 @@ In Academy Learn Lab or any CLI environment:
 
 - clone cloudformation template
 
-  **git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git**
+git clone https://github.com/Steven-lei/INFOSYS735-groupassessment2.git
 
 - change directory
 
-  **cd INFOSYS735-groupassessment2/**
+cd INFOSYS735-groupassessment2/
 
 - create s3 bucket to hold the templates
 
-  **s3api create-bucket --bucket anygroup-templates --query "Location" --output text**
+aws s3api create-bucket --bucket anygroup-templates --query "Location" --output text
 
-  _anygroup-templates is the bucketname_
+_anygroup-templates is the bucketname_ it is globally unique, change it to an appropriate name for testing
 
 - upload to S3 bucket
 
-  **aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"**
+aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
 
 - deploy with main.yaml (the others are nested and will be run automatically)
 
@@ -157,3 +157,13 @@ https://anygroup-templates.s3.us-east-1.amazonaws.com/main.yaml
 testing oracle connection:
 sqlplus "dbadmin/.,'2iy6!;5<tX(F#@//anygroup-rdsinstance.crx8ulj2vvni.us-east-1.rds.amazonaws.com:1521/ORCL"
 replace the password and dbhost with the value from secrets manager
+
+### deploy S3 for static website
+
+run staticwebsite.template
+
+git clone https://github.com/Steven-lei/cafe-static.git
+
+cd cafe-static
+
+aws s3 sync . s3://anygroup-web-group15 --region us-east-1 --exclude ".git/\*"
