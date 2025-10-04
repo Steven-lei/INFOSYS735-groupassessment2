@@ -21,19 +21,19 @@ Parameters:
   #List of the public subnets
   PublicSubnets:
     Description: Select the public subnets
-    Type: List<AWS::EC2::Subnet::Id>
+    Type: CommaDelimitedList
     ConstraintDescription: "Must be a valid subnet ID"
 
   #List of the private subnets
   AppSubnets:
     Description: Select the App subnets
-    Type: List<AWS::EC2::Subnet::Id>
+    Type: CommaDelimitedList
     ConstraintDescription: "Must be a valid subnet ID"
   #List of the db subnets
   DBSubnets:
     Description: Select the DB subnets
-    Type: List<AWS::EC2::Subnet::Id>
-    ConstraintDescription: "Must be a valid subnet ID"
+    Type: CommaDelimitedList
+    ConstraintDescription: "Must be a valid subnet ID,empty for no DB"
     Default: ""
 Conditions:
   DBSubnetsExist: !Not [!Equals [!Join ["", !Ref DBSubnets], ""]]
