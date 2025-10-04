@@ -67,7 +67,7 @@ Resources:
       AllocatedStorage: "20"
       DBInstanceClass: db.t3.small
       Engine: MySQL
-      EngineVersion: "8.0.33"
+      EngineVersion: "8.0.42"
       MasterUsername: dbadmin
       DBName: "cafe"
       MasterUserPassword: !Sub "{{resolve:secretsmanager:${DBSecret}:SecretString:password}}"
