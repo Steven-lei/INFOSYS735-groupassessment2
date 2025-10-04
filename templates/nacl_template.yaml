@@ -23,6 +23,7 @@ Parameters:
     Description: Select the public subnets
     Type: List<AWS::EC2::Subnet::Id>
     ConstraintDescription: "Must be a valid subnet ID"
+
   #List of the private subnets
   PrivateSubnets:
     Description: Select the private subnets
@@ -33,6 +34,7 @@ Parameters:
     Description: Select the DB subnets
     Type: List<AWS::EC2::Subnet::Id>
     ConstraintDescription: "Must be a valid subnet ID"
+    Default: []
 Conditions:
   DBSubnetsExist: !Not [!Equals [!Join ["", !Ref DBSubnets], ""]]
 Resources:
