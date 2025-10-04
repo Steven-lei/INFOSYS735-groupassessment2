@@ -34,7 +34,7 @@ Parameters:
     Description: Select the DB subnets
     Type: List<AWS::EC2::Subnet::Id>
     ConstraintDescription: "Must be a valid subnet ID"
-    Default: []
+    Default: ""
 Conditions:
   DBSubnetsExist: !Not [!Equals [!Join ["", !Ref DBSubnets], ""]]
 Resources:
