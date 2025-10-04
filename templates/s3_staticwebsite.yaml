@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: |
   Create an S3 bucket with static website hosting enabled
-  Create CodePipeline for CI/CD from Github to S3 website
+  Create CodePipeline for CI/CD from Github to S3 website (cannot implement it due to Lab environment limitation)
 Parameters:
   namePrefix:
     Type: String
