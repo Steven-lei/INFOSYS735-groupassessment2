@@ -15,9 +15,8 @@ Parameters:
     Description: S3 bucket name for the static website (must be globally unique, lowercase)
     MinLength: 3
     MaxLength: 63
-    AllowedPattern: "^[a-z0-9.-]+$"
-    ConstraintDescription: "Bucket name must be lowercase, 3-63 characters, and only contain lowercase letters, numbers, dots, and hyphens."
-
+    AllowedPattern: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$"
+    ConstraintDescription: "Bucket name must be lowercase, 3-63 characters, start and end with a letter or number, and only contain lowercase letters, numbers, dots, and hyphens."
   repositoryUrl:
     Type: String
     #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
