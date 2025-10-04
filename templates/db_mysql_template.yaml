@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create DBSubnetGroup, RDS instance for MySQL, and Save the credentials in Secrets Manager.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Conditions:
+  EnvProd: !Equals [!Ref EnvType, "prod"]
+  EnvDev: !Equals [!Ref EnvType, "dev"]
+  EnvTest: !And
+    - !Not [!Condition EnvProd]
+    - !Not [!Condition EnvDev]
+
+Parameters:
+  #Prefix for resource names
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+
+  #SubnetIds for DB Subnet Group
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs for the DB Subnet Group
+
+  SecurityGroupId:
+    Type: String
+    Description: Security Group ID for the RDS instance
+
+  EnvType:
+    Type: String
+    Default: "dev"
+    Description: |
+      dev: deploy the RDS with single AZ
+      prod: deploy the RDS with Multi-AZ
+Resources:
+  #Create secret in Secrets Manager to store RDS credentials, dbhost, dbport, dbname,and dburl will be added automatically
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub ${namePrefix}-RDSSecret
+      Description: Secret for RDS instance credentials
+      GenerateSecretString:
+        SecretStringTemplate: !Sub |
+          {"username": "dbadmin"}
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: Name
+          Value: !Sub ${namePrefix}-RDSSecret
+  #Create DB Subnet Group for RDS instance
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS instance
+      SubnetIds: !Ref SubnetIds
+      Tags:
+        - Key: Name
+          Value: !Sub ${namePrefix}-DBSubnetGroup
+  #Create RDS instance for MySQL
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub ${namePrefix}-RDSInstance
+      StorageType: gp2
+      AllocatedStorage: "20"
+      DBInstanceClass: db.t3.small
+      Engine: MySQL
+      EngineVersion: "8.0.33"
+      MasterUsername: dbadmin
+      DBName: "cafe"
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DBSecret}:SecretString:password}}"
+      StorageEncrypted: true
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref SecurityGroupId
+      MultiAZ: !If [EnvProd, true, false] #allowing Muti-AZ in Product environment
+      PubliclyAccessible: !If [EnvTest, true, false] # allowing public access for test
+      DeletionProtection: false
+      #BackupRetentionPeriod: 7 # Enable automated backups with a retention period of 7 days
+      #PreferredBackupWindow: "03:00-04:00" # Set preferred backup window
+      #PreferredMaintenanceWindow: "sun:05:00-sun:06:00" # Set preferred maintenance window
+      Tags:
+        - Key: Name
+          Value: !Sub ${namePrefix}-RDSInstance
+  DBSecretAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref DBSecret
+      TargetId: !Ref RDSInstance
+      TargetType: AWS::RDS::DBInstance
+    DependsOn: RDSInstance
+Outputs:
+  RDSEndpoint:
+    Description: RDS endpoint address
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub ${namePrefix}-RDSEndpoint
+
+  RDSPort:
+    Description: RDS endpoint port
+    Value: !GetAtt RDSInstance.Endpoint.Port
+    Export:
+      Name: !Sub ${namePrefix}-RDSPort

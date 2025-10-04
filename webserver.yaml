@@ -81,7 +81,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: NeedDB
     Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/db_template.yaml"
+      TemplateURL: !Sub "${repositoryUrl}/templates/db_mysql_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
         SubnetIds: !Join [
