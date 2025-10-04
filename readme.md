@@ -166,4 +166,4 @@ git clone https://github.com/Steven-lei/cafe-static.git
 
 cd cafe-static
 
-aws s3 sync . s3://anygroup-web-group15 --region us-east-1 --exclude ".git/\*"
+aws s3 sync . s3://anygroup-web-group15 --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"

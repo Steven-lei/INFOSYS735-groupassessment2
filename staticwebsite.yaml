@@ -11,7 +11,7 @@ Parameters:
     Description: Prefix for resource names
   BucketName:
     Type: String
-    Default: anygroup-static-website
+    Default: static-website.anygroup.theflower.co.nz
     Description: S3 bucket name for the static website (must be globally unique, lowercase)
     MinLength: 3
     MaxLength: 63
