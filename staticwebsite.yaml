@@ -9,7 +9,10 @@ Parameters:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
-
+  BucketName:
+    Type: String
+    Default: anygroup-static-website
+    Description: S3 bucket name for the static website (must be globally unique)
   repositoryUrl:
     Type: String
     #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
@@ -24,6 +27,7 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/s3_staticwebsite.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
+        BucketName: !Ref BucketName
 
 Outputs:
   WebsiteURL:
