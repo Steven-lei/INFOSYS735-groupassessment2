@@ -12,7 +12,12 @@ Parameters:
   BucketName:
     Type: String
     Default: anygroup-static-website
-    Description: S3 bucket name for the static website (must be globally unique)
+    Description: S3 bucket name for the static website (must be globally unique, lowercase)
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: "^[a-z0-9.-]+$"
+    ConstraintDescription: "Bucket name must be lowercase, 3-63 characters, and only contain lowercase letters, numbers, dots, and hyphens."
+
   repositoryUrl:
     Type: String
     #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
