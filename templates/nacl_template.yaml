@@ -25,8 +25,8 @@ Parameters:
     ConstraintDescription: "Must be a valid subnet ID"
 
   #List of the private subnets
-  PrivateSubnets:
-    Description: Select the private subnets
+  AppSubnets:
+    Description: Select the App subnets
     Type: List<AWS::EC2::Subnet::Id>
     ConstraintDescription: "Must be a valid subnet ID"
   #List of the db subnets

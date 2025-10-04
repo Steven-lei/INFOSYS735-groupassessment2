@@ -47,7 +47,7 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/nacl_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        VpcId: !GetAtt NetworkStack.Outputs.VPCId
         PublicSubnets:
           !Join [
             ",",
