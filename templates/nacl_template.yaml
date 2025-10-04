@@ -162,10 +162,10 @@ Resources:
         To: 80
   # Allow ephemeral ports for response traffic
   AppNACLInboundEphemeral:
-    Condition: PublicSubnetsExist
+    Condition: AppSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
-      NetworkAclId: !Ref PublicNACL
+      NetworkAclId: !Ref AppNACL
       RuleNumber: 120
       Protocol: 6 # TCP
       RuleAction: allow
@@ -219,10 +219,10 @@ Resources:
         To: 1521
   # Allow ephemeral ports for response traffic
   DBNACLInboundEphemeral:
-    Condition: PublicSubnetsExist
+    Condition: DBSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
-      NetworkAclId: !Ref PublicNACL
+      NetworkAclId: !Ref DBNACL
       RuleNumber: 120
       Protocol: 6 # TCP
       RuleAction: allow
