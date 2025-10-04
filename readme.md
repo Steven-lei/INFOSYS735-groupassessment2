@@ -160,10 +160,12 @@ replace the password and dbhost with the value from secrets manager
 
 ### deploy S3 for static website
 
-run staticwebsite.template
+create S3 bucket running staticwebsite.template
 
 git clone https://github.com/Steven-lei/cafe-static.git
 
 cd cafe-static
 
-aws s3 sync . s3://anygroup-web-group15 --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
+aws s3 sync . s3://static-website.anygroup.theflower.co.nz --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
+
+access the static website with url: http://static-website.anygroup.theflower.co.nz/
