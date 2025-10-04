@@ -70,8 +70,8 @@ Resources:
             !Join [
               ",",
               [
-                !GetAtt NetworkStack.Outputs.DBSubnetAId,
-                !GetAtt NetworkStack.Outputs.DBSubnetBId,
+                !GetAtt NetworkStack.Outputs.DbSubnetAId,
+                !GetAtt NetworkStack.Outputs.DbSubnetBId,
               ],
             ],
             !Ref AWS::NoValue,
