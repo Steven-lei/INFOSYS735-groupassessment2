@@ -102,8 +102,8 @@ Resources:
         From: 443
         To: 443
 
-  # Allow SSH (22) if needed
-  PublicNACLInboundSSH:
+  # Allow ephemeral ports for response traffic
+  PublicNACLInboundEphemeral:
     Condition: PublicSubnetsExist
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -114,8 +114,8 @@ Resources:
       Egress: false
       CidrBlock: 0.0.0.0/0
       PortRange:
-        From: 22
-        To: 22
+        From: 1024
+        To: 65535
 
   # Outbound rules
   # Allow all outbound
@@ -160,6 +160,20 @@ Resources:
       PortRange:
         From: 80
         To: 80
+  # Allow ephemeral ports for response traffic
+  AppNACLInboundEphemeral:
+    Condition: PublicSubnetsExist
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      RuleNumber: 120
+      Protocol: 6 # TCP
+      RuleAction: allow
+      Egress: false
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 1024
+        To: 65535
 
   # Outbound rules
   # Allow all outbound
@@ -203,6 +217,20 @@ Resources:
       PortRange:
         From: 1521
         To: 1521
+  # Allow ephemeral ports for response traffic
+  DBNACLInboundEphemeral:
+    Condition: PublicSubnetsExist
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref PublicNACL
+      RuleNumber: 120
+      Protocol: 6 # TCP
+      RuleAction: allow
+      Egress: false
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 1024
+        To: 65535
 
   DBNACLInboundHTTPMySql:
     Condition: DBSubnetsExist
