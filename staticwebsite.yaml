@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Deoploy a multi-tier application architecture using nested CloudFormation stacks.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  BucketName:
+    Type: String
+    Default: static-website.anygroup.theflower.co.nz
+    Description: S3 bucket name for the static website (must be globally unique, lowercase)
+    MinLength: 3
+    MaxLength: 63
+    AllowedPattern: "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$"
+    ConstraintDescription: "Bucket name must be lowercase, 3-63 characters, start and end with a letter or number, and only contain lowercase letters, numbers, dots, and hyphens."
+  repositoryUrl:
+    Type: String
+    #GitURL: https://raw.githubusercontent.com/Steven-lei/INFOSYS735-groupassessment2/main
+    #BucketURL: https://anygroup-templates.s3.us-east-1.amazonaws.com
+    Default: https://anygroup-templates.s3.us-east-1.amazonaws.com
+    Description: S3 bucket URL where the nested stack templates are stored, such as https://s3.amazonaws.com/your-bucket-name
+
+Resources:
+  StaticWebsite:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/s3_staticwebsite.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        BucketName: !Ref BucketName
+
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt StaticWebsite.Outputs.WebsiteURL
+    Description: The URL of the static website

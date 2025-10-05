@@ -49,20 +49,32 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-AppSG"
+  # SecurityGroupDb:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: Enable Oracle from App SG only
+  #     VpcId: !Ref VPCId
+  #     SecurityGroupIngress:
+  #       - IpProtocol: tcp
+  #         FromPort: 1521
+  #         ToPort: 1521
+  #         SourceSecurityGroupId: !Ref SecurityGroupApp # Allow oracle from App SG
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${namePrefix}-DbSG"
   SecurityGroupDb:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable Oracle from App SG only
+      GroupDescription: Enable mysql from App SG only
       VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 1521
-          ToPort: 1521
+          FromPort: 3306
+          ToPort: 3306
           SourceSecurityGroupId: !Ref SecurityGroupApp # Allow MySQL/Aurora from App SG
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-DbSG"
-
   SecurityGroupSSH:
     Type: AWS::EC2::SecurityGroup
     Properties:
