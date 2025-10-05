@@ -11,6 +11,10 @@ Parameters:
     Type: String
     Default: AnyGroup
     Description: Prefix for resource names
+  AMI:
+    Type: String
+    Default: ami-050f77a20bff56c4f
+    Description: the golden AMI ID, use /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 to create a golden image
   MyIP:
     Type: String
     Description: |
@@ -75,7 +79,7 @@ Resources:
           ]
         InstanceType: t2.micro
         KeyName: !Ref KeyName
-        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        LatestAmiId: !Ref AMI
         EC2InstanceProfile: !Ref EC2InstanceProfile
   DBStack:
     Type: AWS::CloudFormation::Stack
