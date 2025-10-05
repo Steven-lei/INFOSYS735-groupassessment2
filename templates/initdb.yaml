@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Initialize the database using the script.
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+
+Parameters:
+  namePrefix:
+    Type: String
+    Default: AnyGroup
+    Description: Prefix for resource names
+  DBSecretArn:
+    Type: String
+    Description: The ARN of the secret that contains the database credentials
+  RoleArn:
+    Type: String
+    Description: The ARN of the IAM role that the Lambda function will assume
+  DBScriptUrl:
+    Type: String
+    Description: URL of the initialization script
+Resources:
+  InitDBFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${namePrefix}-InitDBFunction"
+      Handler: index.handler
+      Role: !Ref RoleArn
+      Runtime: python3.11
+      Timeout: 300
+      Environment:
+        Variables:
+          DB_SECRET_ARN: !Ref DBSecretArn
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          import urllib.request
+          import base64
+          import pymysql
+
+          def get_db_credentials(secret_arn):
+              client = boto3.client('secretsmanager')
+              response = client.get_secret_value(SecretId=secret_arn)
+              secret = json.loads(response['SecretString'])
+              return secret
+
+          def lambda_handler(event, context):
+              secret_arn = os.environ['DB_SECRET_ARN']
+              db_credentials = get_db_credentials(secret_arn)
+
+              db_host = db_credentials['host']
+              db_user = db_credentials['username']
+              db_password = db_credentials['password']
+              db_name = db_credentials['dbname']
+
+              # Download the initialization script
+              script_url = event['DBScriptUrl']
+              response = urllib.request.urlopen(script_url)
+              sql_script = response.read().decode('utf-8')
+
+              # Connect to the database and execute the script
+              connection = pymysql.connect(host=db_host, user=db_user, password=db_password, database=db_name)
+              try:
+                  with connection.cursor() as cursor:
+                      for statement in sql_script.split(';'):
+                          if statement.strip():
+                              cursor.execute(statement)
+                  connection.commit()
+              finally:
+                  connection.close()
+
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Database initialized successfully')
+              }

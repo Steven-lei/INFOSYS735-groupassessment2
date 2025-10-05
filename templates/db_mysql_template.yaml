@@ -103,3 +103,9 @@ Outputs:
     Value: !GetAtt RDSInstance.Endpoint.Port
     Export:
       Name: !Sub ${namePrefix}-RDSPort
+
+  DBSecretArn:
+    Description: ARN of the Secrets Manager secret that contains the RDS credentials
+    Value: !Ref DBSecret
+    Export:
+      Name: !Sub ${namePrefix}-DBSecretArn

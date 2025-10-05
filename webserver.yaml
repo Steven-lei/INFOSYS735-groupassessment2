@@ -37,6 +37,7 @@ Parameters:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances
     Default: LabInstanceProfile
+
   CreateDB:
     Type: String
     Default: "no"
@@ -97,3 +98,14 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
         EnvType: "test"
+
+  InitDBStack:
+    Type: AWS::CloudFormation::Stack
+    Condition: NeedDB
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/initdb.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        DBSecretArn: !GetAtt DBStack.Outputs.DBSecretArn
+        RoleArn: !Ref EC2InstanceProfile
+        DBScriptUrl: !Sub "${repositoryUrl}/scripts/init_db.py"
