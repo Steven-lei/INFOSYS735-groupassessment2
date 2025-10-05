@@ -55,11 +55,50 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
+          # ====== System update ======
           yum update -y
-          yum install -y httpd
-          systemctl start httpd
+
+          # ====== Install PHP 8.2, Apache, MySQL client ======
+          amazon-linux-extras enable php8.2
+          yum install php-cli php-fpm php-mysqlnd php-json php-common php-mbstring php-curl php-xml git unzip httpd mariadb105 -y
+
+          # ====== Create Default Page ======
+          echo "<html><h1>Welcome to EC2 with Private IP: $(curl http://169.254.169.254/latest/meta-data/local-ipv4)</h1></html>" > /var/www/html/myipaddress.html
+          echo "<html>healthcheck ok</html>" > /var/www/html/healthcheck.html
+
+          # ====== Enable & start Apache ======
           systemctl enable httpd
-          echo "<html><h1>Welcome to EC2 with Private IP: $(curl http://169.254.169.254/latest/meta-data/local-ipv4)</h1></html>" > /var/www/html/index.html
+          systemctl start httpd
+
+          # ====== Install Composer ======
+          cd /tmp
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          composer --version
+
+          # ====== Deploy application ======
+          cd /home/ec2-user
+          git clone --no-checkout https://github.com/Steven-lei/Cafe.git
+          cd Cafe
+          git sparse-checkout init --cone
+          git sparse-checkout set cafe_secrets
+          git checkout
+
+          # Copy app files to Apache root
+          mkdir -p /var/www/html/cafe
+          cp -r cafe_secrets/* /var/www/html/cafe/
+
+          # ====== Install AWS SDK for PHP ======
+          cd /var/www/html/cafe 
+          php /usr/local/bin/composer require aws/aws-sdk-php
+
+          # ====== Permissions ======
+          chown -R apache:apache /var/www/html/cafe
+          chmod -R 755 /var/www/html/cafe
+
+          # ====== Restart Apache ======
+          systemctl restart httpd
+
       Tags:
         - Key: Name
           Value: !Sub ${namePrefix}-WebInstance
