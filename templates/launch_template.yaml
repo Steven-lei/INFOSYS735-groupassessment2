@@ -12,7 +12,7 @@ Parameters:
     Type: String
     Description: Security Group ID for the EC2 instances
   LatestAmiId:
-    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Type: String
     Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
   InstanceType:
     Description: Enter t2.micro, t2.small, t3.micro, and t3.small, default is t2.small.
