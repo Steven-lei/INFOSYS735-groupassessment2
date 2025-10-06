@@ -13,7 +13,7 @@ Parameters:
     Description: Prefix for resource names
   AMI:
     Type: String
-    Default: ami-050f77a20bff56c4f
+    Default: ami-07d72c15abe9995d6
     Description: the golden AMI ID, use /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 to create a golden image
   MyIP:
     Type: String

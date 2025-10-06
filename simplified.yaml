@@ -31,6 +31,11 @@ Parameters:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances
     Default: LabInstanceProfile
+
+  AMI:
+    Type: String
+    Default: ami-07d72c15abe9995d6
+    Description: the golden AMI ID, use /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 to create a golden image
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
 Resources:
@@ -93,7 +98,7 @@ Resources:
         namePrefix: !Ref namePrefix
         InstanceType: t2.micro
         KeyName: !Ref KeyName
-        LatestAmiId: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+        LatestAmiId: !Ref AMI
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
         EC2InstanceProfile: !Ref EC2InstanceProfile
 
