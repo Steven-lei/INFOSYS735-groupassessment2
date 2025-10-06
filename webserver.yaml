@@ -107,5 +107,5 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         DBSecretArn: !GetAtt DBStack.Outputs.DBSecretArn
-        RoleArn: !Ref EC2InstanceProfile
+        RoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole" #using the labrole of each environment
         DBScriptUrl: !Sub "${repositoryUrl}/scripts/init_db.py"
