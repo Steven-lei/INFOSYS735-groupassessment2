@@ -75,6 +75,7 @@ Resources:
             ",",
             [
               !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId,
+              !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId,
               !GetAtt SecurityGroupStack.Outputs.SSHSecurityGroupId,
             ],
           ]
