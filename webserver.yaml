@@ -74,7 +74,7 @@ Resources:
           !Join [
             ",",
             [
-              !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId,
+              !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId,
               !GetAtt SecurityGroupStack.Outputs.SSHSecurityGroupId,
             ],
           ]
@@ -98,14 +98,3 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
         EnvType: "test"
-
-  InitDBStack:
-    Type: AWS::CloudFormation::Stack
-    Condition: NeedDB
-    Properties:
-      TemplateURL: !Sub "${repositoryUrl}/templates/initdb.yaml"
-      Parameters:
-        namePrefix: !Ref namePrefix
-        DBSecretArn: !GetAtt DBStack.Outputs.DBSecretArn
-        RoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole" #using the labrole of each environment
-        DBScriptUrl: !Sub "${repositoryUrl}/scripts/init_db.py"
