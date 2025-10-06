@@ -168,3 +168,7 @@ cd cafe-static
 aws s3 sync . s3://static-website.anygroup.theflower.co.nz --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
 
 access the static website with url: http://static-website.anygroup.theflower.co.nz/
+
+database initialization:
+
+access the initdb.php such as http://static-website.anygroup.theflower.co.nz/cafe/initdb.php
