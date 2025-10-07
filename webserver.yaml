@@ -77,8 +77,8 @@ Resources:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
         SubnetIds:
-          - !GetAtt NetworkStack.Outputs.AppSubnetAId
-          - !GetAtt NetworkStack.Outputs.AppSubnetBId
+          - !GetAtt NetworkStack.Outputs.LoadBalancerSubnetAId
+          - !GetAtt NetworkStack.Outputs.LoadBalancerSubnetBId
         TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
         ALBSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
   WebServerStack:

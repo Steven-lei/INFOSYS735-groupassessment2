@@ -22,14 +22,14 @@ Parameters:
   ALBSecurityGroupId:
     Type: String
     Description: Security Group ID for the Application Load Balancer
-  ECRRepositoryUri:
-    Type: String
-    Description: URI of the ECR repository that contains the Docker image for the ECS tasks
-    Default: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com"
-  TaskExecutionRoleArn:
-    Type: String
-    Description: ARN of the IAM role that the ECS tasks will use for execution
-    Default: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+  # ECRRepositoryUri:
+  #   Type: String
+  #   Description: URI of the ECR repository that contains the Docker image for the ECS tasks
+  #   Default: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com"
+  # TaskExecutionRoleArn:
+  #   Type: String
+  #   Description: ARN of the IAM role that the ECS tasks will use for execution
+  #   Default: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
 Resources:
   #cluster for Fargate
   ECSCluster:
@@ -53,12 +53,12 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      TaskRoleArn: !Ref TaskExecutionRoleArn
-      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      TaskRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-UserAPI-Container"
           #the latest version of the image in the userapi repository
-          Image: !Sub "${ECRRepositoryUri}/userapi-repo:latest"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/userapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
@@ -100,7 +100,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-ThreadAPI-Container"
           #the latest version of the image in the threadapi repository
-          Image: !Sub "${ECRRepositoryUri}/threadapi-repo:latest"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/threadapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
@@ -142,7 +142,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-PostsAPI-Container"
           #the latest version of the image in the postsapi repository
-          Image: !Sub "${ECRRepositoryUri}/postsapi-repo:latest"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/postsapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
