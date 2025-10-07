@@ -1,0 +1,290 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Deploy an ECS cluster with Fargate Only type, ALB, Task definitions, and services.
+  userapi,threadapi,postsapi
+Metadata:
+  Comment: This is a group project for course INFOSYS 735 group assessment2
+  Owner: Group 15
+Parameters:
+  namePrefix:
+    Type: String
+    Default: anygroup
+    Description: Prefix for resource names
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID where the ECS cluster will be created
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs where the ECS cluster will be created
+  TasksSecurityGroupId:
+    Type: String
+    Description: Security Group ID for the ECS tasks
+  ALBSecurityGroupId:
+    Type: String
+    Description: Security Group ID for the Application Load Balancer
+  ECRRepositoryUri:
+    Type: String
+    Description: URI of the ECR repository that contains the Docker image for the ECS tasks
+    Default: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com"
+  TaskExecutionRoleArn:
+    Type: String
+    Description: ARN of the IAM role that the ECS tasks will use for execution
+    Default: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+Resources:
+  #cluster for Fargate
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "${namePrefix}-ECS-Cluster"
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ECS-Cluster"
+
+  #Task Definition for UserAPI
+  UserAPITaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${namePrefix}-UserAPI-TaskDefinition"
+      Cpu: "256"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref TaskExecutionRoleArn
+      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: !Sub "${namePrefix}-UserAPI-Container"
+          #the latest version of the image in the userapi repository
+          Image: !Sub "${ECRRepositoryUri}/userapi-repo:latest"
+          PortMappings:
+            - ContainerPort: 3000
+          Essential: true
+  #Service for UserAPI, using the same ALB with routeing to /api/users/*
+  UserAPIService:
+    Type: AWS::ECS::Service
+    DependsOn: ALBListener
+    Properties:
+      ServiceName: !Sub "${namePrefix}-UserAPI-Service"
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref UserAPITaskDefinition
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref TasksSecurityGroupId
+          Subnets: !Ref SubnetIds
+      LoadBalancers:
+        - TargetGroupArn: !Ref UserAPITargetGroup
+          ContainerName: !Sub "${namePrefix}-UserAPI-Container"
+          ContainerPort: 3000
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-UserAPI-Service"
+  #Task Definition for ThreadAPI
+  ThreadAPITaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${namePrefix}-ThreadAPI-TaskDefinition"
+      Cpu: "256"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref TaskExecutionRoleArn
+      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: !Sub "${namePrefix}-ThreadAPI-Container"
+          #the latest version of the image in the threadapi repository
+          Image: !Sub "${ECRRepositoryUri}/threadapi-repo:latest"
+          PortMappings:
+            - ContainerPort: 3000
+          Essential: true
+  #Service for ThreadAPI, using the same ALB with routeing to /api/threads/*
+  ThreadAPIService:
+    Type: AWS::ECS::Service
+    DependsOn: ALBListener
+    Properties:
+      ServiceName: !Sub "${namePrefix}-ThreadAPI-Service"
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref ThreadAPITaskDefinition
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref TasksSecurityGroupId
+          Subnets: !Ref SubnetIds
+      LoadBalancers:
+        - TargetGroupArn: !Ref ThreadAPITargetGroup
+          ContainerName: !Sub "${namePrefix}-ThreadAPI-Container"
+          ContainerPort: 3000
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ThreadAPI-Service"
+  #Task Definition for PostsAPI
+  PostsAPITaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${namePrefix}-PostsAPI-TaskDefinition"
+      Cpu: "256"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref TaskExecutionRoleArn
+      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: !Sub "${namePrefix}-PostsAPI-Container"
+          #the latest version of the image in the postsapi repository
+          Image: !Sub "${ECRRepositoryUri}/postsapi-repo:latest"
+          PortMappings:
+            - ContainerPort: 3000
+          Essential: true
+  #Service for PostsAPI, using the same ALB with routeing to /api/posts/*
+  PostsAPIService:
+    Type: AWS::ECS::Service
+    DependsOn: ALBListener
+    Properties:
+      ServiceName: !Sub "${namePrefix}-PostsAPI-Service"
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref PostsAPITaskDefinition
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref TasksSecurityGroupId
+          Subnets: !Ref SubnetIds
+      LoadBalancers:
+        - TargetGroupArn: !Ref PostsAPITargetGroup
+          ContainerName: !Sub "${namePrefix}-PostsAPI-Container"
+          ContainerPort: 3000
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-PostsAPI-Service"
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${namePrefix}-ALB"
+      Subnets: !Ref SubnetIds
+      SecurityGroups:
+        - !Ref ALBSecurityGroupId
+      Scheme: internet-facing
+      type: application
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ALB"
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: 404
+            ContentType: text/plain
+            MessageBody: "This API is not supported yet. Please use /api/users, /api/threads, or /api/posts."
+  UserAPITargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${namePrefix}-UserAPI-TG"
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref VPCId
+      HealthCheckPath: /api/users/
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      TargetType: ip
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-UserAPI-TargetGroup"
+  ThreadAPITargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${namePrefix}-ThreadAPI-TG"
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref VPCId
+      HealthCheckPath: /api/threads/
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      TargetType: ip
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-ThreadAPI-TargetGroup"
+  PostsAPITargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${namePrefix}-PostsAPI-TG"
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref VPCId
+      HealthCheckPath: /api/posts/
+      HealthCheckIntervalSeconds: 10
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      TargetType: ip
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-PostsAPI-TargetGroup"
+  UserAPIListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref ALBListener
+      Priority: 10
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /api/users*
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref UserAPITargetGroup
+  ThreadAPIListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref ALBListener
+      Priority: 20
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /api/threads*
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref ThreadAPITargetGroup
+  PostsAPIListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref ALBListener
+      Priority: 30
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /api/posts*
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref PostsAPITargetGroup
+Outputs:
+  ECSClusterName:
+    Description: Name of the ECS Cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-ECSClusterName"
+  ALBDNSName:
+    Description: DNS Name of the Application Load Balancer
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+    Export:
+      Name: !Sub "${AWS::StackName}-ALBDNSName"

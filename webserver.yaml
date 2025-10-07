@@ -44,9 +44,15 @@ Parameters:
     AllowedValues: ["yes", "no"]
     Description: |
       Whether to create a RDS database
+  CreateMicroservices:
+    Type: String
+    Default: "no"
+    AllowedValues: ["yes", "no"]
+    Description: |
+      Whether to create Microservices for API hosting
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
-
+  NeedECS: !Equals [!Ref CreateECS, "yes"]
 Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
@@ -62,7 +68,24 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
-
+  ECSStack:
+    Condition: CreateMicroservices
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/ecs_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.APPSubnetAId,
+              !GetAtt NetworkStack.Outputs.APPSubnetBId,
+            ],
+          ]
+        TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
+        ALBSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
   WebServerStack:
     Type: AWS::CloudFormation::Stack
     Properties:
