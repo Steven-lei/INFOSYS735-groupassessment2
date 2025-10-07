@@ -80,8 +80,8 @@ Resources:
           !Join [
             ",",
             [
-              !GetAtt NetworkStack.Outputs.APPSubnetAId,
-              !GetAtt NetworkStack.Outputs.APPSubnetBId,
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
             ],
           ]
         TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
