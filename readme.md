@@ -104,7 +104,7 @@ _anygroup-templates is the bucketname_ it is globally unique, change it to an ap
 
 - upload to S3 bucket
 
-aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
+aws s3 sync . s3://anygroup-templates --region us-east-1 --exclude ".git/\*"
 
 - deploy with main.yaml (the others are nested and will be run automatically)
 
@@ -165,7 +165,7 @@ git clone https://github.com/Steven-lei/cafe-static.git
 
 cd cafe-static
 
-aws s3 sync . s3://static-website.anygroup.theflower.co.nz --region us-east-1 --exclude ".git/\*" --exclude ".git/\*\*" --exclude ".git"
+aws s3 sync . s3://static-website.anygroup.theflower.co.nz --region us-east-1 --exclude ".git/\*"
 
 access the static website with url: http://static-website.anygroup.theflower.co.nz/
 
