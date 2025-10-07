@@ -52,7 +52,7 @@ Parameters:
       Whether to create Microservices for API hosting
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
-  NeedECS: !Equals [!Ref CreateECS, "yes"]
+  NeedECS: !Equals [!Ref CreateMicroservices, "yes"]
 Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
@@ -69,7 +69,7 @@ Resources:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
   ECSStack:
-    Condition: CreateMicroservices
+    Condition: NeedECS
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub "${repositoryUrl}/templates/ecs_template.yaml"
