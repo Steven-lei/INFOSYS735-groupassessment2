@@ -7,13 +7,13 @@ Metadata:
 Parameters:
   namePrefix:
     Type: String
-    Default: AnyGroup
+    Default: anygroup
     Description: Prefix for resource names
 Resources:
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub "${namePrefix}-AppRepository"
+      RepositoryName: !Sub "${namePrefix}-apprepository"
       ImageScanningConfiguration:
         ScanOnPush: true
       EncryptionConfiguration:
