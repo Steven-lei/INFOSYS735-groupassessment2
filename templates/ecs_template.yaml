@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: |
-  Deploy an ECS cluster with Fargate Only type, ALB, Task definitions, and services.
+  Deploy an ECS cluster with Fargate, ALB, Task definitions, and services.
   userapi,threadapi,postsapi
 Metadata:
   Comment: This is a group project for course INFOSYS 735 group assessment2
