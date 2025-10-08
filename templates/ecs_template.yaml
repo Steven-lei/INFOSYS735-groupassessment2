@@ -177,7 +177,6 @@ Resources:
       SecurityGroups:
         - !Ref ALBSecurityGroupId
       Scheme: internet-facing
-      type: application
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-ALB"
