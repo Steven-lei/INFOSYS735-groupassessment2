@@ -95,8 +95,8 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      TaskRoleArn: !Ref TaskExecutionRoleArn
-      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      TaskRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-ThreadAPI-Container"
           #the latest version of the image in the threadapi repository
@@ -137,8 +137,8 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      TaskRoleArn: !Ref TaskExecutionRoleArn
-      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      TaskRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
+      ExecutionRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/LabRole"
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-PostsAPI-Container"
           #the latest version of the image in the postsapi repository
