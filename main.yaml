@@ -35,7 +35,7 @@ Parameters:
     Type: String
     Default: ami-07d72c15abe9995d6
     Description: the golden AMI ID, use /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 to create a golden image
- CreateMicroservices:
+  CreateMicroservices:
     Type: String
     Default: "no"
     AllowedValues: ["yes", "no"]
