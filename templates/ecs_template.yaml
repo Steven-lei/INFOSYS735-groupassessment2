@@ -70,7 +70,7 @@ Resources:
       ServiceName: !Sub "${namePrefix}-UserAPI-Service"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref UserAPITaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -112,7 +112,7 @@ Resources:
       ServiceName: !Sub "${namePrefix}-ThreadAPI-Service"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref ThreadAPITaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -154,7 +154,7 @@ Resources:
       ServiceName: !Sub "${namePrefix}-PostsAPI-Service"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref PostsAPITaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -200,7 +200,7 @@ Resources:
       Protocol: HTTP
       VpcId: !Ref VPCId
       HealthCheckPath: /api/users/
-      HealthCheckIntervalSeconds: 10
+      HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
@@ -216,7 +216,7 @@ Resources:
       Protocol: HTTP
       VpcId: !Ref VPCId
       HealthCheckPath: /api/threads/
-      HealthCheckIntervalSeconds: 10
+      HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
@@ -232,7 +232,7 @@ Resources:
       Protocol: HTTP
       VpcId: !Ref VPCId
       HealthCheckPath: /api/posts/
-      HealthCheckIntervalSeconds: 10
+      HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
