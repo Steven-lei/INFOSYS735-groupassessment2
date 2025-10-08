@@ -137,12 +137,20 @@ Resources:
       Parameters:
         namePrefix: !Ref namePrefix
         VPCId: !GetAtt NetworkStack.Outputs.VPCId
-        SubnetIds:
+        TasksSubnetIds:
           !Join [
             ",",
             [
               !GetAtt NetworkStack.Outputs.AppSubnetAId,
               !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
+        ALBSubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.PublicSubnetAId,
+              !GetAtt NetworkStack.Outputs.PublicSubnetBId,
             ],
           ]
         TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.ApiSecurityGroupId

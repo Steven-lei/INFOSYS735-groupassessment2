@@ -13,7 +13,10 @@ Parameters:
   VPCId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the ECS cluster will be created
-  SubnetIds:
+  TasksSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of Subnet IDs where the ECS cluster will be created
+  ALBSubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: List of Subnet IDs where the ECS cluster will be created
   TasksSecurityGroupId:
@@ -77,7 +80,7 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref TasksSecurityGroupId
-          Subnets: !Ref SubnetIds
+          Subnets: !Ref TasksSubnetIds
       LoadBalancers:
         - TargetGroupArn: !Ref UserAPITargetGroup
           ContainerName: !Sub "${namePrefix}-UserAPI-Container"
@@ -119,7 +122,7 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref TasksSecurityGroupId
-          Subnets: !Ref SubnetIds
+          Subnets: !Ref TasksSubnetIds
       LoadBalancers:
         - TargetGroupArn: !Ref ThreadAPITargetGroup
           ContainerName: !Sub "${namePrefix}-ThreadAPI-Container"
@@ -161,7 +164,7 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref TasksSecurityGroupId
-          Subnets: !Ref SubnetIds
+          Subnets: !Ref TasksSubnetIds
       LoadBalancers:
         - TargetGroupArn: !Ref PostsAPITargetGroup
           ContainerName: !Sub "${namePrefix}-PostsAPI-Container"
@@ -173,7 +176,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: !Sub "${namePrefix}-API-ALB"
-      Subnets: !Ref SubnetIds
+      Subnets: !Ref ALBSubnetIds
       SecurityGroups:
         - !Ref ALBSecurityGroupId
       Scheme: internet-facing
