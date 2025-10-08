@@ -49,6 +49,20 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${namePrefix}-AppSG"
+
+  SecurityGroupAPIs:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable TCP 3000 from ALB SG only
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref SecurityGroupLoadALB # Allow HTTP from Load Balancer SG
+      Tags:
+        - Key: Name
+          Value: !Sub "${namePrefix}-AppSG"
   # SecurityGroupDb:
   #   Type: AWS::EC2::SecurityGroup
   #   Properties:
@@ -109,3 +123,9 @@ Outputs:
     Value: !Ref SecurityGroupSSH
     Export:
       Name: !Sub "${AWS::StackName}-SSHSecurityGroupId"
+
+  ApiSecurityGroupId:
+    Description: Security Group ID for APIs allowing TCP 3000
+    Value: !Ref SecurityGroupAPIs
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiSecurityGroupId"

@@ -84,7 +84,7 @@ Resources:
               !GetAtt NetworkStack.Outputs.PublicSubnetBId,
             ],
           ]
-        TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.AppSecurityGroupId
+        TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.ApiSecurityGroupId
         ALBSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
   WebServerStack:
     Type: AWS::CloudFormation::Stack

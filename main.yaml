@@ -35,8 +35,15 @@ Parameters:
     Type: String
     Default: ami-07d72c15abe9995d6
     Description: the golden AMI ID, use /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 to create a golden image
+ CreateMicroservices:
+    Type: String
+    Default: "no"
+    AllowedValues: ["yes", "no"]
+    Description: |
+      Whether to create Microservices for API hosting
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
+  NeedECS: !Equals [!Ref CreateMicroservices, "yes"]
 Resources:
   NetworkStack:
     Type: AWS::CloudFormation::Stack
@@ -122,3 +129,21 @@ Resources:
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
         EnvType: "prod"
+  ECSStack:
+    Condition: NeedECS
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${repositoryUrl}/templates/ecs_template.yaml"
+      Parameters:
+        namePrefix: !Ref namePrefix
+        VPCId: !GetAtt NetworkStack.Outputs.VPCId
+        SubnetIds:
+          !Join [
+            ",",
+            [
+              !GetAtt NetworkStack.Outputs.AppSubnetAId,
+              !GetAtt NetworkStack.Outputs.AppSubnetBId,
+            ],
+          ]
+        TasksSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.ApiSecurityGroupId
+        ALBSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.LoadBalancerSecurityGroupId
