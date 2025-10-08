@@ -172,14 +172,14 @@ Resources:
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub "${namePrefix}-ALB"
+      Name: !Sub "${namePrefix}-API-ALB"
       Subnets: !Ref SubnetIds
       SecurityGroups:
         - !Ref ALBSecurityGroupId
       Scheme: internet-facing
       Tags:
         - Key: Name
-          Value: !Sub "${namePrefix}-ALB"
+          Value: !Sub "${namePrefix}-API-ALB"
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
