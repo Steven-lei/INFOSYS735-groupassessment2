@@ -25,6 +25,10 @@ Parameters:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances
     Default: LabInstanceProfile
+  SNSEmail:
+    Type: String
+    Description: Email addresses for SNS notification
+    Default: "shifeihao@outlook.com"
   CreateDB:
     Type: String
     Default: "no"
@@ -89,6 +93,7 @@ Resources:
           ]
         LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
         LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+        Email: !Ref SNSEmail
   ALBStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:

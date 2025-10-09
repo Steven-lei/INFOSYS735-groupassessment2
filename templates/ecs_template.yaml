@@ -61,7 +61,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-UserAPI-Container"
           #the latest version of the image in the userapi repository
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/userapi-repo:latest"
+          Image: !Sub "steven0327/userapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
@@ -103,7 +103,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-ThreadAPI-Container"
           #the latest version of the image in the threadapi repository
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/threadapi-repo:latest"
+          Image: !Sub "steven0327/threadsapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
@@ -145,7 +145,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-PostsAPI-Container"
           #the latest version of the image in the postsapi repository
-          Image: !Sub "${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/postsapi-repo:latest"
+          Image: !Sub "steven0327/postsapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
