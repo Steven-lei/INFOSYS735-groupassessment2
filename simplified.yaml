@@ -43,6 +43,11 @@ Parameters:
     AllowedValues: ["yes", "no"]
     Description: |
       Whether to create Microservices for API hosting
+
+  SNSEmail:
+    Type: String
+    Description: Email addresses for SNS notification
+    Default: "shifeihao@outlook.com"
 Conditions:
   NeedDB: !Equals [!Ref CreateDB, "yes"]
   NeedECS: !Equals [!Ref CreateMicroservices, "yes"]
@@ -127,6 +132,7 @@ Resources:
           ]
         LaunchTemplateId: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateId
         LaunchTemplateVersion: !GetAtt LaunchTemplateStack.Outputs.LaunchTemplateVersion
+        Email: !Ref SNSEmail
   ALBStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
