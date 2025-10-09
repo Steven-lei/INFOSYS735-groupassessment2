@@ -62,7 +62,7 @@ Resources:
           SourceSecurityGroupId: !Ref SecurityGroupLoadALB # Allow HTTP from Load Balancer SG
       Tags:
         - Key: Name
-          Value: !Sub "${namePrefix}-AppSG"
+          Value: !Sub "${namePrefix}-AppAPISG"
   # SecurityGroupDb:
   #   Type: AWS::EC2::SecurityGroup
   #   Properties:
