@@ -61,7 +61,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub "${namePrefix}-UserAPI-Container"
           #the latest version of the image in the userapi repository
-          Image: !Sub "steven0327/userapi-repo:latest"
+          Image: !Sub "steven0327/usersapi-repo:latest"
           PortMappings:
             - ContainerPort: 3000
           Essential: true
@@ -202,7 +202,7 @@ Resources:
       Port: 3000
       Protocol: HTTP
       VpcId: !Ref VPCId
-      HealthCheckPath: /api/users/
+      HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
@@ -218,7 +218,7 @@ Resources:
       Port: 3000
       Protocol: HTTP
       VpcId: !Ref VPCId
-      HealthCheckPath: /api/threads/
+      HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
@@ -234,7 +234,7 @@ Resources:
       Port: 3000
       Protocol: HTTP
       VpcId: !Ref VPCId
-      HealthCheckPath: /api/posts/
+      HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
