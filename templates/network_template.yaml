@@ -518,7 +518,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref AppNACL
-      RuleNumber: 200
+      RuleNumber: 999
       Protocol: 6 # TCP
       RuleAction: allow
       Egress: false
@@ -637,7 +637,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref DBNACL
-      RuleNumber: 100
+      RuleNumber: 999
       Protocol: 6 # TCP
       RuleAction: allow
       Egress: false
@@ -684,7 +684,7 @@ Resources:
       RuleAction: allow
       Egress: true
       CidrBlock: 0.0.0.0/0
-      
+
   # DBNACLOutboundAllowPatches:
   #   Type: AWS::EC2::NetworkAclEntry
   #   Properties:
