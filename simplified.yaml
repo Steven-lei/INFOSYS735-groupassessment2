@@ -31,7 +31,14 @@ Parameters:
     Type: String
     Description: IAM Instance Profile Name for the EC2 instances
     Default: LabInstanceProfile
-
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues: ["dev", "prod"]
+    Description: |
+      The environment this stack will be used in.
+      dev - development environment, not highly available
+      prod - production environment, highly available: RDS with Multi-AZ, NAT gateway in each AZ
   AMI:
     Type: String
     Default: ami-07d72c15abe9995d6
@@ -58,7 +65,7 @@ Resources:
       TemplateURL: !Sub "${repositoryUrl}/templates/network_template.yaml"
       Parameters:
         namePrefix: !Ref namePrefix
-        EnvType: dev
+        EnvType: !Ref Environment
 
   SecurityGroupStack:
     Type: AWS::CloudFormation::Stack
@@ -134,7 +141,7 @@ Resources:
             ],
           ]
         SecurityGroupId: !GetAtt SecurityGroupStack.Outputs.DbSecurityGroupId
-        EnvType: "dev"
+        EnvType: !Ref Environment
   ECSStack:
     Condition: NeedECS
     Type: AWS::CloudFormation::Stack
