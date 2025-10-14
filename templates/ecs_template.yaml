@@ -288,7 +288,6 @@ Resources:
     Properties:
       Name: !Sub "${namePrefix}-HTTP-API"
       ProtocolType: HTTP
-      # 如果你希望按 Host 头路由，可在客户端设置 Host，但这里使用 path proxy 转发
       Description: "HTTP API that proxies requests to the ALB"
 
   # Integration - proxy to ALB (HTTP)
@@ -298,12 +297,28 @@ Resources:
       ApiId: !Ref ApiGatewayHttpApi
       IntegrationType: HTTP_PROXY
       IntegrationMethod: ANY
-      IntegrationUri: !Sub "http://${ApplicationLoadBalancer.DNSName}"
+      IntegrationUri: !Sub "http://${ApplicationLoadBalancer.DNSName}/api/users/{proxy}"
+      ConnectionType: INTERNET
+      PayloadFormatVersion: "1.0"
+  ApiGatewayThreadsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGatewayHttpApi
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Sub "http://${ApplicationLoadBalancer.DNSName}/api/threads/{proxy}"
+      ConnectionType: INTERNET
+      PayloadFormatVersion: "1.0"
+  ApiGatewayPostsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGatewayHttpApi
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Sub "http://${ApplicationLoadBalancer.DNSName}/api/posts/{proxy}"
       ConnectionType: INTERNET
       PayloadFormatVersion: "1.0"
 
-  # Reuse same integration for all routes (可用单一 integration 转发全部 path)
-  # Routes for users, threads, posts (catch-all proxy)
   ApiGatewayUsersRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -322,8 +337,7 @@ Resources:
       Target: !Join
         - /
         - - "integrations"
-          - !Ref ApiGatewayUsersIntegration
-
+          - !Ref ApiGatewayThreadsIntegration
   ApiGatewayPostsRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:
@@ -332,18 +346,7 @@ Resources:
       Target: !Join
         - /
         - - "integrations"
-          - !Ref ApiGatewayUsersIntegration
-
-  # Optional: 根路径也转发到 ALB（比如 health check）
-  ApiGatewayRootRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref ApiGatewayHttpApi
-      RouteKey: "ANY /"
-      Target: !Join
-        - /
-        - - "integrations"
-          - !Ref ApiGatewayUsersIntegration
+          - !Ref ApiGatewayPostsIntegration
 
   # Stage (auto-deploy)
   ApiGatewayStage:
