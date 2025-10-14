@@ -323,7 +323,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGatewayHttpApi
-      RouteKey: "ANY /api/users/{proxy+}"
+      RouteKey: "ANY /users/{proxy+}"
       Target: !Join
         - /
         - - "integrations"
@@ -333,7 +333,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGatewayHttpApi
-      RouteKey: "ANY /api/threads/{proxy+}"
+      RouteKey: "ANY /threads/{proxy+}"
       Target: !Join
         - /
         - - "integrations"
@@ -342,7 +342,7 @@ Resources:
     Type: AWS::ApiGatewayV2::Route
     Properties:
       ApiId: !Ref ApiGatewayHttpApi
-      RouteKey: "ANY /api/posts/{proxy+}"
+      RouteKey: "ANY /posts/{proxy+}"
       Target: !Join
         - /
         - - "integrations"
